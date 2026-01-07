@@ -1,12 +1,15 @@
 import './assets/styles/index.scss';
 import.meta.glob('@shared/ui/*/*.scss', {eager: true});
 
-import button from '@shared/ui/button/button.hbs';
+import Button from '@shared/ui/button/button.hbs';
+import Input from '@shared/ui/input/input.hbs';
+
 import Handlebars from 'handlebars/runtime';
 import Home from '@pages/Home.hbs';
 import _404 from '@pages/404.hbs'
 
-Handlebars.registerPartial('button', button);
+Handlebars.registerPartial('Button', Button);
+Handlebars.registerPartial('Input', Input);
 
 const Templates = new Map([
     ['Home', Home],
