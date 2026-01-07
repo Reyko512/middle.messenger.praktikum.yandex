@@ -17,10 +17,9 @@ const Templates = new Map([
 ])
 
 function renderRoute(){
-    const hash = window.location.hash.slice(1) || 'home';
-
-    switch(hash){
-        case 'home':
+    const hash = window.location.pathname.split('/');
+    switch(hash[hash.length - 1]){
+        case '':
             return Templates.get('Home')({});
 
         default:
