@@ -1,0 +1,21 @@
+.not-found-page{
+    margin: 0 auto;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    &__header{
+        margin: 0;
+        font-size: 96px;
+        margin-bottom: 8px;
+    }
+
+    &__code{
+        margin: 0;
+        margin-bottom: 8px;
+        font-size: 86px;
+        font-weight: 800;
+    }
+}

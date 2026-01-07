@@ -1,0 +1,25 @@
+.auth-page{
+    padding-top: 112px;
+
+    &__header{
+        margin: 0;
+        text-align: center;
+        font-size: 96px;
+        margin-bottom: 8px;
+    }
+    .auth-form{
+        margin: 0 auto;
+        width: 302px;
+
+        &__inputs{
+            margin-bottom: 24px;
+        }
+
+        &__buttons{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            column-gap: 8px;
+        }
+    }
+}
