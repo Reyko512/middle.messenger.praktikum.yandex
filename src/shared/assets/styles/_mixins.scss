@@ -1,0 +1,53 @@
+//placement
+@mixin absolute-center(){
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@mixin absolute-vertical-center(){
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+@mixin flex-center(){
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-column(){
+    display: flex;
+    flex-direction: column;
+}
+
+@mixin flex-vertical-center(){
+    display: flex;
+    align-items: center;
+}
+
+@mixin flex-horizontal-center(){
+    display: flex;
+    justify-content: center;
+}
+
+//borders
+@mixin border-bottom(){
+    border-bottom: 1px solid var(--floating-white);
+}
+
+@mixin border-top(){
+    border-top: 1px solid var(--floating-white);
+}
+
+@mixin border-right(){
+    border-right: 1px solid var(--floating-white);
+}
+
+//utils
+@mixin size($width, $height){
+    height: $height;
+    width: $width;
+}

@@ -8,11 +8,25 @@ export default defineConfig({
   publicDir: path.resolve(__dirname, 'static'),
   
   resolve:{
-    alias:{
+    alias: {
       '@shared': path.resolve(__dirname, 'src/shared/'),
-      '@pages': path.resolve(__dirname, 'src/pages/')
+      '@pages': path.resolve(__dirname, 'src/pages/'),
+      '@entities': path.resolve(__dirname, 'src/entities/'),
+      '@features': path.resolve(__dirname, 'src/features/'),
+      '@styles': path.resolve(__dirname, 'src/shared/assets/styles/')
     },
   },
+  css: {
+  preprocessorOptions: {
+    scss: {
+    loadPaths: [
+      path.resolve(__dirname, 'src/shared/assets/styles')  
+    ]   
+    }
+  }
+  },
+  
+  
   
   plugins: [
     handlebars({

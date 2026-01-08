@@ -1,10 +1,10 @@
+@use 'mixins' as *;
+
 .not-found-page{
     margin: 0 auto;
     text-align: center;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    
+    @include absolute-center();
 
     &__header{
         margin: 0;

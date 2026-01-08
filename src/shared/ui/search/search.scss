@@ -1,0 +1,35 @@
+@use 'mixins' as *;
+
+.search{
+    position: relative;
+    width: 100%;
+    background-color: var(--filter-white);
+    border-radius: var(--radius-s);
+    color: var(--dark-primary);
+    
+    &__field{
+        @include size(100%, 100%);
+        padding: 4px 40px 4px 16px;
+
+        &::placeholder{
+            color: var(--white)
+        }
+    }
+
+    &__icon{
+        @include size(20px, 20px);
+        @include absolute-vertical-center();
+
+        right: 16px;
+        cursor: pointer;
+        path{
+            transition: fill .3s ease-in-out;
+        }
+
+        &:hover{
+            path{
+                fill: var(--teal);
+            }
+        }
+    }
+}

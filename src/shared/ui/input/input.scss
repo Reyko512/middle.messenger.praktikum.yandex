@@ -1,9 +1,11 @@
+@use 'mixins' as *;
+
 .input{
     position: relative;
-    display: flex;
     row-gap: 4px;
-    flex-direction: column;
     color: var(--floating-white);
+    
+    @include flex-column();
     
     &__label{
         order: 2;
@@ -20,7 +22,8 @@
         outline: none;
         border: none;
         background: none;
-        border-bottom: 1px solid var(--floating-white);
+        
+        @include border-bottom();
     }
 
     &__error{
