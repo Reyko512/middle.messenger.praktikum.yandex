@@ -4,49 +4,16 @@
             {{>Link text="settings" href='/sign-in'}}
             {{>Search placeholder="Search"}}
         </div>
-        <ul class="chat-list">
-            {{>ChatItem avatarUrl=null name="Никита" lastMessage="something important..." counter=0 time="21:00"}}
-            {{>ChatItem avatarUrl=null name="Никита" lastMessage="something important..." counter=0 time="21:00"}}
-            {{>ChatItem avatarUrl=null name="Никита" lastMessage="something important..." counter=0 time="21:00"}}
-            {{>ChatItem avatarUrl=null name="Никита" lastMessage="something important..." counter=0 time="21:00"}}
-            {{>ChatItem avatarUrl=null name="Никита" lastMessage="something important..." counter=0 time="21:00"}}
-            {{>ChatItem avatarUrl=null name="Никита" lastMessage="something important..." counter=0 time="21:00"}}
-        </ul>
+        {{>ChatFeed }}
     </aside>
     <main class="chat">
-        <div class="user-bar">
-            <div class="user-bar__info">
-                {{>Avatar avatarUrl=null}}
-                <p>name</p>
-            </div>
-            <div class="settings">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#clip0_54_995)">
-                        <path d="M12 7.5C12.8284 7.5 13.5 6.82843 13.5 6C13.5 5.17157 12.8284 4.5 12 4.5C11.1716 4.5 10.5 5.17157 10.5 6C10.5 6.82843 11.1716 7.5 12 7.5Z" fill="white" fill-opacity="0.6"/>
-                        <path d="M12 13.5C12.8284 13.5 13.5 12.8284 13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12C10.5 12.8284 11.1716 13.5 12 13.5Z" fill="white" fill-opacity="0.6"/>
-                        <path d="M12 19.5C12.8284 19.5 13.5 18.8284 13.5 18C13.5 17.1716 12.8284 16.5 12 16.5C11.1716 16.5 10.5 17.1716 10.5 18C10.5 18.8284 11.1716 19.5 12 19.5Z" fill="white" fill-opacity="0.6"/>
-                    </g>
-                    <defs>
-                    <clipPath id="clip0_54_995">
-                        <rect width="24" height="24" fill="white"/>
-                    </clipPath>
-                    </defs>
-                </svg>
-            </div>
-        </div>
+        {{>ChatInfobar}}
         <div class="chat-view">
             <p class="no-messages">
                 no messages yet...
             </p>
         </div>
-        <div class="chat-communication">
-            {{>FileInput id="attach-file" name="attach-file"}}
-            {{>MessageInput placeholder="Write a message..." value="" }}
-            <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M0.00809523 16L17 8L0.00809523 0L0 6.22222L12.1429 8L0 9.77778L0.00809523 16Z" fill="white" fill-opacity="0.6"/>
-</svg>
-
-        </div>
+        {{>ChatComposer }}
     </main>
 </div>
 

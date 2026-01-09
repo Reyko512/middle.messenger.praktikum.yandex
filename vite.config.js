@@ -13,6 +13,7 @@ export default defineConfig({
       '@pages': path.resolve(__dirname, 'src/pages/'),
       '@entities': path.resolve(__dirname, 'src/entities/'),
       '@features': path.resolve(__dirname, 'src/features/'),
+      '@widgets': path.resolve(__dirname, 'src/widgets/'),
       '@styles': path.resolve(__dirname, 'src/shared/assets/styles/')
     },
   },
@@ -30,7 +31,7 @@ export default defineConfig({
   
   plugins: [
     handlebars({
-      partialDirectory: (path.resolve(__dirname, 'src/shared/ui/'))
+      partialDirectory: [path.resolve(__dirname, 'src/shared/ui/'), path.resolve(__dirname, 'src/pages/**/**')]
     }), customhbs() 
 ],
 });

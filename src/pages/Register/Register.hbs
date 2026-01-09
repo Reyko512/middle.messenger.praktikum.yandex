@@ -1,0 +1,19 @@
+<div class="registration-page">
+<main>
+    <h1 class="registration-page__header">REGISTRATION</h1>
+    <form class="registration-form" action="#">
+        <div class="registration-form__inputs">
+            {{>Input label="First name" id="first_name" type="text"}}
+            {{>Input label="Last name" id="second_name" type="text"}}
+            {{>Input label="Login" id="login" type="text"}}
+            {{>Input label="Email" id="email" type="text"}}
+            {{>Input label="Phone" id="phone" type="tel"}}
+            {{>Input label="Password" id="password" type="password"}}
+        </div>
+        <div class="registration-form__buttons">
+            {{>Button label="Sign up" href="/sign-in"}}
+            {{>Link text="Sign in" href="/sign-in"}}
+        </div>
+    </form>
+</main>
+</div>
