@@ -6,7 +6,9 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   root: path.resolve(__dirname, 'src/app/'),
   publicDir: path.resolve(__dirname, 'static'),
-  
+  build: {
+    outDir: path.resolve(__dirname, '.dist'),
+  },
   resolve:{
     alias: {
       '@shared': path.resolve(__dirname, 'src/shared/'),
@@ -34,4 +36,6 @@ export default defineConfig({
       partialDirectory: [path.resolve(__dirname, 'src/shared/ui/'), path.resolve(__dirname, 'src/pages/**/**')]
     }), customhbs() 
 ],
+
+ 
 });
