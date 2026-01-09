@@ -1,5 +1,5 @@
-import { ChatItem } from "./chat/";
+import { ChatItem } from './chat/';
 
 export default {
-    ChatItem
-}
+  ChatItem,
+};

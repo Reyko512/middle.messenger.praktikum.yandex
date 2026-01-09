@@ -1,21 +1,21 @@
 @use 'mixins' as *;
 
-.not-found-page{
-    margin: 0 auto;
-    text-align: center;
-    
-    @include absolute-center();
+.not-found-page {
+  margin: 0 auto;
+  text-align: center;
 
-    &__header{
-        margin: 0;
-        font-size: 96px;
-        margin-bottom: 8px;
-    }
+  @include absolute-center();
 
-    &__code{
-        margin: 0;
-        margin-bottom: 8px;
-        font-size: 86px;
-        font-weight: 800;
-    }
+  &__header {
+    margin: 0;
+    font-size: 96px;
+    margin-bottom: 8px;
+  }
+
+  &__code {
+    margin: 0;
+    margin-bottom: 8px;
+    font-size: 86px;
+    font-weight: 800;
+  }
 }

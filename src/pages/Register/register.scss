@@ -1,24 +1,23 @@
-.registration-page{
-    padding: 16px;
-    &__header{
-        font-size: 56px;
-        margin: 0 auto;
-        text-align: center;
-        margin-bottom: 16px;
-    }
-    .registration-form{
-        margin: 0 auto;
-        max-width: 264px;
+.registration-page {
+  padding: 16px;
+  &__header {
+    font-size: 56px;
+    margin: 0 auto;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .registration-form {
+    margin: 0 auto;
+    max-width: 264px;
 
-        &__inputs{
-            margin-bottom: 16px;
-        }
-
-        &__buttons{
-            display: flex;
-            align-items: center;
-            justify-content: space-evenly;
-        }
+    &__inputs {
+      margin-bottom: 16px;
     }
 
+    &__buttons {
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+    }
+  }
 }

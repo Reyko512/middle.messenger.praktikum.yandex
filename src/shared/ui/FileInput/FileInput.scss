@@ -1,23 +1,23 @@
-.file-input{
-    $root: &;
-    width: min-content;
-    
-    &__icon{
-        cursor: pointer;
-        path{
-            transition: stroke .2s ease-in-out;
-        }
-    }
+.file-input {
+  $root: &;
+  width: min-content;
 
-    input{
-        display: none;
+  &__icon {
+    cursor: pointer;
+    path {
+      transition: stroke 0.2s ease-in-out;
     }
+  }
 
-    &:hover{
-        #{$root}__icon{
-            path{
-                stroke: var(--teal);
-            }
-        }
+  input {
+    display: none;
+  }
+
+  &:hover {
+    #{$root}__icon {
+      path {
+        stroke: var(--teal);
+      }
     }
+  }
 }

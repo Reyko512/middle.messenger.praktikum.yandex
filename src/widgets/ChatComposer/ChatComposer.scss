@@ -1,10 +1,10 @@
 @use 'mixins' as *;
 
-.chat-composer{
-    @include border-top();
-    display: grid;
-    grid-template-columns: 3% 92% 4%;   
-    align-items: center;    
-    padding: 8px 16px; 
-    column-gap: 8px;
+.chat-composer {
+  @include border-top();
+  display: grid;
+  grid-template-columns: 3% 92% 4%;
+  align-items: center;
+  padding: 8px 16px;
+  column-gap: 8px;
 }

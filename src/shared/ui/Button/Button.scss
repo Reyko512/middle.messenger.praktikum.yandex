@@ -1,28 +1,30 @@
 .button {
-    outline: none;
-    border: none;
+  outline: none;
+  border: none;
 
+  background: var(--filter-white);
+  border-radius: var(--radius-s);
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 400;
+
+  padding: 8px 44px;
+
+  transition:
+    background 0.3s ease-in-out,
+    color 0.2s ease-out;
+
+  &:hover {
+    background: var(--teal);
+  }
+
+  &:active {
+    background: var(--white);
+    color: var(--dark-primary);
+  }
+
+  &:disabled {
     background: var(--filter-white);
-    border-radius: var(--radius-s);
-    color: var(--white);
-    font-size: 16px;
-    font-weight: 400;
-
-    padding: 8px 44px;
-
-    transition: background .3s ease-in-out, color .2s ease-out;
-
-    &:hover{
-        background: var(--teal);
-    }
-
-    &:active{
-        background: var(--white);
-        color: var(--dark-primary);
-    }
-
-    &:disabled{
-        background: var(--filter-white);
-        color: var(--dark-glass)
-    }
+    color: var(--dark-glass);
+  }
 }

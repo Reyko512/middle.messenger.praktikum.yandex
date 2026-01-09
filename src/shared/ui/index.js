@@ -7,11 +7,11 @@ import MessageInput from './MessageInput/MessageInput.hbs';
 import Search from './Search/Search.hbs';
 
 export default {
-    Avatar,
-    Button,
-    FileInput,
-    Input,
-    Link,
-    MessageInput,
-    Search
-}
+  Avatar,
+  Button,
+  FileInput,
+  Input,
+  Link,
+  MessageInput,
+  Search,
+};
