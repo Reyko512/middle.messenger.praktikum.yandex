@@ -4,7 +4,7 @@
 
 ## design: https://www.figma.com/design/ejSycYEFYGPpu8EfV1jZu6/messanger-byte?node-id=1-4&t=XGArgxmmIffhONdF-1
 
-## netlify: https://69614ccc6ce01600083efbb6--charming-haupia-7d6657.netlify.app/
+## netlify: https://charming-haupia-7d6657.netlify.app/
 
 ---
 
