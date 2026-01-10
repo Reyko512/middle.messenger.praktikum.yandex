@@ -1,6 +1,6 @@
-@use 'mixins' as *;
+@use "mixins" as *;
 
-.chat-composer {
+.send-message-form {
   @include border-top();
   display: grid;
   grid-template-columns: 3% 92% 4%;

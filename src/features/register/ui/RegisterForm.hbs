@@ -1,0 +1,14 @@
+<form class="registration-form" action="#">
+  <div class="registration-form__inputs">
+    {{>Input label="First name" id="first_name" type="text" autocomplete="given-name"}}
+    {{>Input label="Last name" id="second_name" type="text" autocomplete="family-name"}}
+    {{>Input label="Login" id="login" type="text" autocomplete="username"}}
+    {{>Input label="Email" id="email" type="text" autocomplete="email"}}
+    {{>Input label="Phone" id="phone" type="tel" autocomplete="tel"}}
+    {{>Input label="Password" id="password" type="password" autocomplete="new-password"}}
+  </div>
+  <div class="registration-form__buttons">
+    {{>Button label="Sign up" type="submit"}}
+    {{>Link text="Sign in" href="/sign-in"}}
+  </div>
+</form>

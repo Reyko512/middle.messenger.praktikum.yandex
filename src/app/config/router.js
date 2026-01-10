@@ -4,12 +4,19 @@ import Register from '@pages/Register/Register.hbs';
 import _404 from '@pages/_404/404.hbs';
 import _500 from '@pages/_500/500.hbs';
 
+import { default as UserModal } from '@widgets/UserModal/UserModal.hbs';
+import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/ChangePasswordModal.hbs';
+import { default as ChangeCommonInfoModal } from '@widgets/ChangeCommonInfoModal/ChangeCommonInfoModal.hbs';
+
 const Templates = new Map([
   ['Chats', Chats],
   ['404', _404],
   ['Auth', Auth],
   ['500', _500],
   ['Register', Register],
+  ['UserModal', UserModal],
+  ['ChangePasswordModal', ChangePasswordModal],
+  ['ChangeCommonInfoModal', ChangeCommonInfoModal],
 ]);
 
 export default function renderRoute() {
@@ -26,6 +33,15 @@ export default function renderRoute() {
 
     case '500':
       return Templates.get('500')({});
+
+    case 'user-data':
+      return Templates.get('UserModal')({});
+
+    case 'change-password':
+      return Templates.get('ChangePasswordModal')({});
+
+    case 'change-info':
+      return Templates.get('ChangeCommonInfoModal')({});
 
     default:
       return Templates.get('404')({});

@@ -1,0 +1,16 @@
+@use "mixins" as *;
+
+.auth-form {
+  margin: 0 auto;
+  width: 302px;
+
+  &__inputs {
+    margin-bottom: 24px;
+  }
+
+  &__buttons {
+    @include flex-center();
+
+    column-gap: 8px;
+  }
+}

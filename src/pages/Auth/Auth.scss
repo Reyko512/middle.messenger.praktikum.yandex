@@ -1,4 +1,4 @@
-@use 'mixins' as *;
+@use "mixins" as *;
 
 .auth-page {
   padding-top: 112px;
@@ -8,20 +8,5 @@
     text-align: center;
     font-size: 96px;
     margin-bottom: 8px;
-  }
-
-  .auth-form {
-    margin: 0 auto;
-    width: 302px;
-
-    &__inputs {
-      margin-bottom: 24px;
-    }
-
-    &__buttons {
-      @include flex-center();
-
-      column-gap: 8px;
-    }
   }
 }

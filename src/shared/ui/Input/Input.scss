@@ -4,6 +4,7 @@
   position: relative;
   row-gap: 4px;
   color: var(--floating-white);
+  width: 100%;
 
   @include flex-column();
 
