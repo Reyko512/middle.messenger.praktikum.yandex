@@ -1,0 +1,14 @@
+.registration-form {
+  margin: 0 auto;
+  max-width: 264px;
+
+  &__inputs {
+    margin-bottom: 16px;
+  }
+
+  &__buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+}

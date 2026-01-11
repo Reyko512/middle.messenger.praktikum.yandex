@@ -1,0 +1,12 @@
+@use "mixins" as *;
+
+.auth-page {
+  padding-top: 112px;
+
+  &__header {
+    margin: 0;
+    text-align: center;
+    font-size: 96px;
+    margin-bottom: 8px;
+  }
+}

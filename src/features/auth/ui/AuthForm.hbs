@@ -1,0 +1,10 @@
+<form class="auth-form" action="#">
+    <div class="auth-form__inputs">
+        {{>Input id='login' label="login" name="login" autocomplete="username"}}
+        {{>Input id='password' name="password" type='password' label="password" autocomplete="current-password"}}
+    </div>
+    <div class="auth-form__buttons">
+        {{>Button label='Sign in' type="submit"}}
+        {{>Link text='Create account' href="/sign-up"}}
+    </div>
+</form>

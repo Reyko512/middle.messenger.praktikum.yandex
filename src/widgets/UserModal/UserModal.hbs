@@ -1,0 +1,20 @@
+{{#> Modal}}
+    <section class="user-information">
+        {{>UpdateAvatarForm}}
+
+        <ul class="user-information__common-info">
+            {{>DataRow name="email" value="byte@gmail.com" }}
+            {{>DataRow name="login" value="byte" }}
+            {{>DataRow name="first name" value="Jhon" }}
+            {{>DataRow name="last name" value="Jhonson" }}
+            {{>DataRow name="nickname" value="byters" }}
+            {{>DataRow name="phone" value="+7 (999) 999 99 99" }}
+        </ul>
+
+        <nav class="user-information__links">
+            {{>Link text="Change user data" href="/change-info"}}
+            {{>Link text="Change password" href="/change-password"}}
+            {{>Link text="Logout" href="/sign-in"}}
+        </nav>
+    </section>
+{{/Modal}}

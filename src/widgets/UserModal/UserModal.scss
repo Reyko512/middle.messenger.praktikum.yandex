@@ -1,0 +1,20 @@
+.user-information {
+  width: 348px;
+  .update-avatar-form {
+    margin-bottom: 24px;
+  }
+
+  &__common-info {
+    display: flex;
+    flex-direction: column;
+
+    row-gap: 8px;
+    margin-bottom: 48px;
+  }
+
+  &__links {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+  }
+}

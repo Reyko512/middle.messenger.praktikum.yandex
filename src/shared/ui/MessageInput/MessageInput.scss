@@ -1,0 +1,20 @@
+.message-input {
+  height: 100%;
+  position: relative;
+  max-height: 36px;
+  &__field {
+    resize: none;
+    overflow: hidden;
+    line-height: 1.4;
+    max-height: 100%;
+    padding: 6px 16px;
+    width: 100%;
+
+    border-radius: var(--radius-xl);
+    background: var(--filter-white);
+
+    &::placeholder {
+      color: var(--white);
+    }
+  }
+}
