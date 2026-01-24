@@ -1,7 +1,19 @@
 import handlebars from 'vite-plugin-handlebars';
-import customhbs from './src/app/config/vite-plugin-handlebars-precompile';
+import customhbs from './src/app/config/vite-plugin-handlebars-precompile.js';
 import path from 'path';
+import tsconfig from './tsconfig.json';
 import { defineConfig } from 'vite';
+
+function resolveAliasesFromTsconfig() {
+  const paths = tsconfig.compilerOptions.paths;
+
+  return Object.entries(paths).map(([alias, [target]]) => {
+    const find = alias.replace('/*', '');
+    const replacement = path.resolve(__dirname, target!.replace('/*', ''));
+
+    return { find, replacement };
+  });
+}
 
 export default defineConfig({
   root: path.resolve(__dirname, 'src/app/'),
@@ -10,14 +22,7 @@ export default defineConfig({
     outDir: path.resolve(__dirname, '.dist'),
   },
   resolve: {
-    alias: {
-      '@shared': path.resolve(__dirname, 'src/shared/'),
-      '@pages': path.resolve(__dirname, 'src/pages/'),
-      '@entities': path.resolve(__dirname, 'src/entities/'),
-      '@features': path.resolve(__dirname, 'src/features/'),
-      '@widgets': path.resolve(__dirname, 'src/widgets/'),
-      '@styles': path.resolve(__dirname, 'src/shared/assets/styles/'),
-    },
+    alias: resolveAliasesFromTsconfig(),
   },
   css: {
     preprocessorOptions: {

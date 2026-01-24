@@ -13,6 +13,7 @@
     "start": "npm run build && npm run preview"
   },
   "devDependencies": {
+    "@types/node": "^25.0.10",
     "eslint": "^9.39.2",
     "prettier": "^3.7.4",
     "sass": "^1.97.2",
