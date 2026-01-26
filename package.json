@@ -13,9 +13,9 @@
     "start": "npm run build && npm run preview",
     "lint:style": "stylelint **/*.scss",
     "lint:style-fix": "stylelint **/*.scss --fix",
-    "lint:code": "eslint --config ./.eslintrc.cjs \"src/**/*.ts\"",
+    "lint:code": "eslint --config ./eslint.config.mjs \"src/**/*.ts\"",
     "lint": "npm run lint:code && npm run lint:style",
-    "lint:fix": "eslint --config ./.eslintrc.cjs \"src/**/*.ts\"--fix"
+    "lint:fix": "eslint --config ./eslint.config.mjs \"src/**/*.ts\"--fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

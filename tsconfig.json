@@ -5,6 +5,7 @@
     "baseUrl": "./",
 
     "module": "preserve",
+    "moduleResolution": "bundler",
     "target": "esnext",
     "types": ["vite/client", "node"],
 
