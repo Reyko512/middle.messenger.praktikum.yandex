@@ -10,16 +10,5 @@ module.exports = {
   bracketSameLine: false,
   arrowParens: 'always',
   endOfLine: 'lf',
-
-  objectWrap: 'preserve',
   proseWrap: 'preserve',
-
-  overrides: [
-    {
-      files: ['*.hbs', '*.handlebars'],
-      options: {
-        parser: 'glimmer',
-      },
-    },
-  ],
 };

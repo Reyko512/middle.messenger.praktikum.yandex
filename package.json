@@ -10,15 +10,24 @@
     "dev": "vite --port 3000",
     "build": "vite build --emptyOutDir",
     "preview": "vite preview --port 3000",
-    "start": "npm run build && npm run preview"
+    "start": "npm run build && npm run preview",
+    "lint": "eslint --config ./.eslintrc.cjs \"src/**/*.ts\"",
+    "lint:fix": "eslint --config ./.eslintrc.cjs \"src/**/*.ts\"--fix"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/node": "^25.0.10",
-    "eslint": "^9.39.2",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "@typescript-eslint/parser": "^8.53.1",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.1.0",
+    "npm": "^11.8.0",
     "prettier": "^3.7.4",
     "sass": "^1.97.2",
     "stylelint": "^17.0.0",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.1",
     "vite": "^7.2.4",
     "vite-plugin-handlebars": "^2.0.0"
   }

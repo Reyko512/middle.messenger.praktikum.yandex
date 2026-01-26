@@ -8,42 +8,55 @@ import { default as UserModal } from '@widgets/UserModal/UserModal.hbs';
 import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/ChangePasswordModal.hbs';
 import { default as ChangeCommonInfoModal } from '@widgets/ChangeCommonInfoModal/ChangeCommonInfoModal.hbs';
 
-const Templates = new Map([
-  ['Chats', Chats],
-  ['404', _404],
-  ['Auth', Auth],
-  ['500', _500],
-  ['Register', Register],
-  ['UserModal', UserModal],
-  ['ChangePasswordModal', ChangePasswordModal],
-  ['ChangeCommonInfoModal', ChangeCommonInfoModal],
+enum COMPONENTS_NAMES {
+  'Chats' = 'Chats',
+  '_404' = '_404',
+  'Auth' = 'Auth',
+  '_500' = '_500',
+  'Register' = 'Register',
+  'UserModal' = 'UserModal',
+  'ChangePasswordModal' = 'ChangePasswordModal',
+  'ChangeCommonInfoModal' = 'ChangeCommonInfoModal',
+}
+
+const Templates = new Map<COMPONENTS_NAMES, typeof Chats>([
+  [COMPONENTS_NAMES.Chats, Chats],
+  [COMPONENTS_NAMES._404, _404],
+  [COMPONENTS_NAMES.Auth, Auth],
+  [COMPONENTS_NAMES._500, _500],
+  [COMPONENTS_NAMES.Register, Register],
+  [COMPONENTS_NAMES.UserModal, UserModal],
+  [COMPONENTS_NAMES.ChangePasswordModal, ChangePasswordModal],
+  [COMPONENTS_NAMES.ChangeCommonInfoModal, ChangeCommonInfoModal],
 ]);
 
 export default function renderRoute() {
   const hash = window.location.pathname.split('/');
-  switch (hash[hash.length - 1]) {
+  const path = hash[hash.length - 1] ?? '';
+
+  switch (path) {
     case '':
-      return Templates.get('Chats')({});
+      return Templates.get(COMPONENTS_NAMES.Chats)?.call({}, {});
 
     case 'sign-in':
-      return Templates.get('Auth')({});
+      return Templates.get(COMPONENTS_NAMES.Auth)?.call({}, {});
 
     case 'sign-up':
-      return Templates.get('Register')({});
+      return Templates.get(COMPONENTS_NAMES.Register)?.call({}, {});
 
     case '500':
-      return Templates.get('500')({});
+      return Templates.get(COMPONENTS_NAMES._500)?.call({}, {});
 
     case 'user-data':
-      return Templates.get('UserModal')({});
+      return Templates.get(COMPONENTS_NAMES.UserModal)?.call({}, {});
 
     case 'change-password':
-      return Templates.get('ChangePasswordModal')({});
+      return Templates.get(COMPONENTS_NAMES.ChangePasswordModal)?.call({}, {});
 
     case 'change-info':
-      return Templates.get('ChangeCommonInfoModal')({});
+      return Templates.get(COMPONENTS_NAMES.ChangeCommonInfoModal)?.call({}, {});
 
     default:
-      return Templates.get('404')({});
+      return Templates.get(COMPONENTS_NAMES._404)?.call({}, {});
   }
 }

@@ -1,5 +1,5 @@
 import Handlebars from 'handlebars/runtime';
-import Button from '@shared/ui/Button/Button.hbs';
+import type Button from '@shared/ui/Button/Button.hbs';
 
 export default function registerComponents(...components: Record<string, typeof Button>[]) {
   for (const componentsObj of components) {

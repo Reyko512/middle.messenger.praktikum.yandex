@@ -16,7 +16,7 @@ function resolveAliasesFromTsconfig() {
 }
 
 export default defineConfig({
-  root: path.resolve(__dirname, 'src/app/'),
+  root: path.resolve(__dirname, './src/app/'),
   publicDir: path.resolve(__dirname, 'static'),
   build: {
     outDir: path.resolve(__dirname, '.dist'),
