@@ -4,10 +4,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   padding: 4px;
   width: 100%;
-
   color: var(--white);
-  @include border-bottom();
+
+  @include border-bottom;
 }

@@ -1,15 +1,12 @@
 .button {
   outline: none;
   border: none;
-
   background: var(--filter-white);
   border-radius: var(--radius-s);
   color: var(--white);
   font-size: 16px;
   font-weight: 400;
-
   padding: 8px 44px;
-
   transition:
     background 0.3s ease-in-out,
     color 0.2s ease-out;

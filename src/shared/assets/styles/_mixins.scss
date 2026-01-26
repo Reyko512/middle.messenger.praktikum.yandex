@@ -1,4 +1,5 @@
-//placement
+// placement
+
 @mixin absolute-center() {
   position: absolute;
   left: 50%;
@@ -33,7 +34,7 @@
   justify-content: center;
 }
 
-//borders
+// borders
 @mixin border-bottom() {
   border-bottom: 1px solid var(--floating-white);
 }
@@ -46,7 +47,7 @@
   border-right: 1px solid var(--floating-white);
 }
 
-//utils
+// utils
 @mixin size($width, $height) {
   height: $height;
   width: $width;

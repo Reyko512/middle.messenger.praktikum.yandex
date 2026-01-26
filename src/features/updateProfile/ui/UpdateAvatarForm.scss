@@ -8,13 +8,15 @@
     box-shadow: 2px 4px 4px var(--dark-primary);
     background-color: var(--floating-white);
     border-radius: 50%;
+
     @include size(79px, 79px);
+
     overflow: hidden;
     position: relative;
 
     &:hover {
       #{$root}__label {
-        bottom: 0px;
+        bottom: 0;
       }
     }
   }
@@ -29,7 +31,6 @@
     justify-content: center;
     background: var(--dark-glass);
     bottom: -100%;
-
     transition: bottom 0.3s ease-in-out;
   }
 }

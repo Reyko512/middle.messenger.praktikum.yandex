@@ -5,18 +5,18 @@
 
   display: flex;
   position: relative;
-
   padding: 12px;
   column-gap: 16px;
-
   background: var(--dark-gray);
-  @include border-bottom();
-  @include border-top();
+
+  @include border-bottom;
+  @include border-top;
 
   cursor: pointer;
 
   &__info {
-    @include flex-column();
+    @include flex-column;
+
     row-gap: 8px;
   }
 
@@ -45,9 +45,9 @@
     font-size: 14px;
     color: var(--white);
 
-    @include absolute-vertical-center();
+    @include absolute-vertical-center;
     @include size(18px, 18px);
-    @include flex-center();
+    @include flex-center;
   }
 
   &:hover {

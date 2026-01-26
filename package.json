@@ -11,7 +11,10 @@
     "build": "vite build --emptyOutDir",
     "preview": "vite preview --port 3000",
     "start": "npm run build && npm run preview",
-    "lint": "eslint --config ./.eslintrc.cjs \"src/**/*.ts\"",
+    "lint:style": "stylelint **/*.scss",
+    "lint:style-fix": "stylelint **/*.scss --fix",
+    "lint:code": "eslint --config ./.eslintrc.cjs \"src/**/*.ts\"",
+    "lint": "npm run lint:code && npm run lint:style",
     "lint:fix": "eslint --config ./.eslintrc.cjs \"src/**/*.ts\"--fix"
   },
   "devDependencies": {
@@ -26,6 +29,7 @@
     "prettier": "^3.7.4",
     "sass": "^1.97.2",
     "stylelint": "^17.0.0",
+    "stylelint-config-standard-scss": "^17.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.53.1",
     "vite": "^7.2.4",

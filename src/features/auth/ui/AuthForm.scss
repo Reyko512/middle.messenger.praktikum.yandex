@@ -9,7 +9,7 @@
   }
 
   &__buttons {
-    @include flex-center();
+    @include flex-center;
 
     column-gap: 8px;
   }
