@@ -1,92 +1,118 @@
 import EventBus from './EventBus';
-
-export default class Component {
-  private static EVENTS = {
+export default abstract class Component {
+  static EVENTS = {
     INIT: 'init',
-    FLOW_CDM: 'flow:component-did-mount',
-    FLOW_RENDER: 'flow:render',
+    BEFORE_MOUNT: 'before-mount',
+    MOUNT: 'mount',
+    BEFORE_UPDATE: 'before-update',
+    UPDATED: 'updated',
+    BEFORE_UNMOUNTED: 'before-unmounted',
+    UNMOUNTED: 'unmounted',
+    RENDER: 'render',
   };
 
-  private _element: HTMLElement | null = null;
-  private _meta: null | { tagName: string; props: object } = null;
+  _element: HTMLElement | null = null;
+  _meta: {
+    tagName: string;
+    props: object;
+  } | null = null;
 
-  props = {};
-  _eventBus;
+  eventBus;
 
-  constructor(tagName: string = 'div', props: object = {}) {
-    this._meta = {
-      tagName,
-      props,
-    };
+  constructor() {
+    const eventBus = new EventBus();
 
-    this.props = this._makePropsProxy(props);
-    this._eventBus = new EventBus();
+    this.eventBus = () => eventBus;
+
+    this._registerEvents(eventBus);
+    eventBus.emit(Component.EVENTS.INIT);
   }
 
-  init() {}
-
-  protected _registerEvents(eventBus: EventBus) {
-    eventBus.on(Component.EVENTS.INIT, this.init.bind(this));
-    eventBus.on(Component.EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
-    eventBus.on(Component.EVENTS.FLOW_RENDER, this._render.bind(this));
+  //system
+  _init() {
+    this._createResources();
+    this.eventBus().emit(Component.EVENTS.RENDER);
   }
 
-  protected _createResources() {
-    if (!this._meta) throw Error('No meta');
+  _beforeMounted() {}
 
-    const { tagName } = this._meta;
-
-    this._element = this._createDocumentElement(tagName);
+  _mounted() {
+    this.eventBus().emit(Component.EVENTS.MOUNT);
+    this.componentDidMount();
   }
 
-  protected _makePropsProxy(_props: object) {
-    const props = new Proxy(_props, {});
-
-    return props;
+  _beforeUpdated() {
+    this.componentDidUpdate();
   }
 
-  protected _createDocumentElement(tagName: string, children?: string[]) {
-    const childCortage = children?.map((item) => document.createElement(item));
-
-    const createdElement = document.createElement(tagName);
-
-    if (childCortage) {
-      childCortage.forEach((item) => createdElement.appendChild(item));
-    }
-
-    return createdElement;
+  _updated(_oldProps: object) {
+    this.componentDidUpdate();
   }
 
-  setProps = (nextProps: object | undefined) => {
-    if (!nextProps) {
-      return;
-    }
+  _beforeUnmounted() {}
 
-    Object.assign(this.props, nextProps);
-  };
-
-  _componentDidMount() {}
-
-  componentDidMount(_oldProps: object) {}
-
-  dispatchComponentDidMount() {
-    this._eventBus.emit(Component.EVENTS.FLOW_CDM);
+  _unmounted() {
+    this.componentDidUnmount();
   }
-
-  _componentDidUpdate(_oldProps: object, _newProps: object) {}
-
-  render() {}
 
   _render() {
     const block = this.render();
+
+    if (!this._element) throw new Error('no element to render!');
+
+    this._element.innerHTML = '';
+
     this._element.innerHTML = block;
+  }
+
+  //utils
+
+  _registerEvents(eventBus: EventBus) {
+    eventBus.on(Component.EVENTS.INIT, this._init.bind(this));
+    eventBus.on(Component.EVENTS.BEFORE_MOUNT, this._beforeMounted.bind(this));
+    eventBus.on(Component.EVENTS.MOUNT, this._mounted.bind(this));
+    eventBus.on(Component.EVENTS.BEFORE_UPDATE, this._beforeUpdated.bind(this));
+    eventBus.on(Component.EVENTS.UPDATED, this._updated.bind(this));
+    eventBus.on(Component.EVENTS.BEFORE_UNMOUNTED, this._beforeUnmounted.bind(this));
+    eventBus.on(Component.EVENTS.UNMOUNTED, this._unmounted.bind(this));
+    eventBus.on(Component.EVENTS.RENDER, this._render.bind(this));
+  }
+
+  _createDocumentElement(tagName: string) {
+    return document.createElement(tagName);
+  }
+
+  _createResources() {
+    if (!this._meta) throw new Error('no meta');
+
+    const { tagName } = this._meta;
+    this._element = this._createDocumentElement(tagName);
+  }
+
+  _makePropsProxy(props: object) {
+    return props;
+  }
+
+  //user overrides
+  abstract render(): string;
+
+  beforeMount() {}
+  componentDidMount(_oldProps: object) {}
+  componentDidUpdate(_oldProps: object, _newProps: object) {
+    return true;
+  }
+  beforeComponentUnmount() {}
+  componentDidUnmount() {}
+
+  //public
+
+  set props(newProps: object) {
+    if (!newProps) return;
+
+    Object.assign(this.props, newProps);
   }
 
   get element() {
     return this._element;
-  }
-
-  getContent() {
-    return this.element;
   }
 }

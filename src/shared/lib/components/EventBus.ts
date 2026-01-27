@@ -1,4 +1,5 @@
-type TFunction = (() => void) | ((...args: unknown[]) => void);
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+type TFunction = Function;
 
 export default class EventBus {
   private listeners: Record<string, TFunction[]>;
@@ -24,5 +25,9 @@ export default class EventBus {
     this.listeners[event]?.forEach((item) => {
       item(...args);
     });
+  }
+
+  clear() {
+    this.listeners = {};
   }
 }

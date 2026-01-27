@@ -1,4 +1,4 @@
-import Chats from '@pages/Chats/Chats.hbs';
+import { Chats } from '@pages/Chats/';
 import Auth from '@pages/Auth/Auth.hbs';
 import Register from '@pages/Register/Register.hbs';
 import _404 from '@pages/_404/404.hbs';
@@ -36,7 +36,8 @@ export default function renderRoute() {
 
   switch (path) {
     case '':
-      return Templates.get(COMPONENTS_NAMES.Chats)?.call({}, {});
+      console.log(Templates.get(COMPONENTS_NAMES.Chats)?.getContent());
+      return Templates.get(COMPONENTS_NAMES.Chats)?.getContent();
 
     case 'sign-in':
       return Templates.get(COMPONENTS_NAMES.Auth)?.call({}, {});

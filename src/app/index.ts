@@ -10,9 +10,8 @@ import widgets from '@widgets/index';
 import sharedUi from '@shared/ui';
 import entities from '@entities/index';
 import features from '@features/index';
-
-import renderRoute from './config/router';
 import registerComponents from '@shared/lib/components/registerComponents';
+import App from './App';
 
 registerComponents(widgets, sharedUi, entities, features);
 
@@ -21,5 +20,5 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!root) {
     throw new Error('No root!');
   }
-  root.innerHTML = renderRoute();
+  root.replaceWith(App.getContent());
 });
