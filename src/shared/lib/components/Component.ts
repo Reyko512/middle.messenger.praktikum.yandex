@@ -2,11 +2,8 @@ import EventBus from './EventBus';
 export default abstract class Component {
   static EVENTS = {
     INIT: 'init',
-    BEFORE_MOUNT: 'before-mount',
     MOUNT: 'mount',
-    BEFORE_UPDATE: 'before-update',
     UPDATED: 'updated',
-    BEFORE_UNMOUNTED: 'before-unmounted',
     UNMOUNTED: 'unmounted',
     RENDER: 'render',
   };
@@ -16,11 +13,19 @@ export default abstract class Component {
     tagName: string;
     props: object;
   } | null = null;
+  props: object;
 
   eventBus;
 
-  constructor() {
+  constructor(tagName = 'div', props = {}) {
     const eventBus = new EventBus();
+
+    this._meta = {
+      tagName,
+      props,
+    };
+
+    this.props = this._makePropsProxy(props);
 
     this.eventBus = () => eventBus;
 
@@ -31,22 +36,24 @@ export default abstract class Component {
   //system
   _init() {
     this._createResources();
+
     this.eventBus().emit(Component.EVENTS.RENDER);
   }
 
   _beforeMounted() {}
 
   _mounted() {
-    this.eventBus().emit(Component.EVENTS.MOUNT);
-    this.componentDidMount();
-  }
-
-  _beforeUpdated() {
-    this.componentDidUpdate();
+    this.componentDidMount({});
   }
 
   _updated(_oldProps: object) {
-    this.componentDidUpdate();
+    const response = this.componentDidUpdate(_oldProps, this.props);
+
+    if (!response) {
+      return;
+    }
+
+    this._render();
   }
 
   _beforeUnmounted() {}
@@ -62,18 +69,15 @@ export default abstract class Component {
 
     this._element.innerHTML = '';
 
-    this._element.innerHTML = block;
+    this._element.innerHTML = block(this.props);
   }
 
   //utils
 
   _registerEvents(eventBus: EventBus) {
     eventBus.on(Component.EVENTS.INIT, this._init.bind(this));
-    eventBus.on(Component.EVENTS.BEFORE_MOUNT, this._beforeMounted.bind(this));
     eventBus.on(Component.EVENTS.MOUNT, this._mounted.bind(this));
-    eventBus.on(Component.EVENTS.BEFORE_UPDATE, this._beforeUpdated.bind(this));
     eventBus.on(Component.EVENTS.UPDATED, this._updated.bind(this));
-    eventBus.on(Component.EVENTS.BEFORE_UNMOUNTED, this._beforeUnmounted.bind(this));
     eventBus.on(Component.EVENTS.UNMOUNTED, this._unmounted.bind(this));
     eventBus.on(Component.EVENTS.RENDER, this._render.bind(this));
   }
@@ -89,30 +93,55 @@ export default abstract class Component {
     this._element = this._createDocumentElement(tagName);
   }
 
-  _makePropsProxy(props: object) {
-    return props;
+  _makePropsProxy(props: Record<string, object>) {
+    return new Proxy(props, {
+      set: (target, key, newValue) => {
+        target[key.toString()] = newValue;
+
+        this.eventBus().emit(Component.EVENTS.UPDATED, { ...target }, target);
+        return true;
+      },
+
+      get: (target, key) => {
+        const value = target[key.toString()];
+        return typeof value === 'function' ? value.bind(target) : value;
+      },
+      deleteProperty() {
+        throw new Error('Нет доступа');
+      },
+    });
   }
 
   //user overrides
-  abstract render(): string;
+  abstract render(): Handlebars.TemplateDelegate;
 
   beforeMount() {}
-  componentDidMount(_oldProps: object) {}
+  componentDidMount(_oldProps: object) {
+    this.componentDidMount(_oldProps);
+  }
   componentDidUpdate(_oldProps: object, _newProps: object) {
     return true;
+  }
+  dispatchComponentDidMount() {
+    this.eventBus().emit(Component.EVENTS.MOUNT);
   }
   beforeComponentUnmount() {}
   componentDidUnmount() {}
 
   //public
+  setProps = (nextProps: object) => {
+    if (!nextProps) {
+      return;
+    }
 
-  set props(newProps: object) {
-    if (!newProps) return;
-
-    Object.assign(this.props, newProps);
-  }
+    Object.assign(this.props, nextProps);
+  };
 
   get element() {
     return this._element;
+  }
+
+  getContent() {
+    return this.element;
   }
 }

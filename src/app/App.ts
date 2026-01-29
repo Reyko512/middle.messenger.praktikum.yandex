@@ -1,27 +1,15 @@
-import Component from '@shared/lib/components/Component';
 import { Chats } from '@pages/Chats';
+import Component from '@shared/lib/components/Component';
+import Handlebars from 'handlebars';
+
 class App extends Component {
-  constructor() {
-    super({
-      tagName: '',
-      template: ``,
-      children: {},
-    });
+  override render() {
+    return Handlebars.compile('');
   }
 
-  protected override render(context: { [x: string]: unknown }): string {
-    return super.render(context);
-  }
-
-  private currentPage: Component | null = Chats;
-
-  public showPage(pageComponent: Component) {
-    if(this.currentPage){
-        this.currentPage.
-    }
-    this.children['page'] = pageComponent;
-    this.render(this.props);
+  override componentDidMount(_oldProps: object): void {
+    this.element?.appendChild(Chats.getContent() as Node);
   }
 }
 
-export default new App();
+export default new App('div', {});
