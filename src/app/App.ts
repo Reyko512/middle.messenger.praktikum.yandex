@@ -1,15 +1,10 @@
 import { Chats } from '@pages/Chats';
 import Component from '@shared/lib/components/Component';
 import Handlebars from 'handlebars';
-
 class App extends Component {
   override render() {
-    return Handlebars.compile('');
-  }
-
-  override componentDidMount(_oldProps: object): void {
-    this.element?.appendChild(Chats.getContent() as Node);
+    return this.compile(Handlebars.compile('{{{Chats}}}'), this.props);
   }
 }
 
-export default new App('div', {});
+export default new App('div', { Chats });

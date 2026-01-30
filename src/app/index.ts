@@ -12,10 +12,11 @@ import entities from '@entities/index';
 import features from '@features/index';
 import registerComponents from '@shared/lib/components/registerComponents';
 import App from './App';
+
 import { render } from '@shared/lib/components/renderDom';
 
 registerComponents(widgets, sharedUi, entities, features);
 
 document.addEventListener('DOMContentLoaded', () => {
-  render('#app', App);
+  setTimeout(() => render('#app', App), 0);
 });

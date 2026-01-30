@@ -34,5 +34,8 @@
     "typescript-eslint": "^8.53.1",
     "vite": "^7.2.4",
     "vite-plugin-handlebars": "^2.0.0"
+  },
+  "dependencies": {
+    "uuid": "^13.0.0"
   }
 }
