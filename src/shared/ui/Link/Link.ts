@@ -1,12 +1,24 @@
+import _template from '@shared/lib/components/_templator';
 import Component from '@shared/lib/components/Component';
-import LinkTemp from './Link.hbs';
-
-class Link extends Component<{ href: string; text: string }> {
-  override render() {
-    return this.compile(LinkTemp, {
-      href: this.props.href,
-      text: this.props.text,
+interface ILinkProps extends Record<string, unknown> {
+  href: string;
+  text: string;
+  className?: string;
+}
+class Link extends Component<ILinkProps> {
+  constructor(props: ILinkProps) {
+    super('a', {
+      ...props,
+      attrs: {
+        href: props.href ?? '#',
+        class: props.className ?? 'link',
+      },
     });
+  }
+
+  render() {
+    const { text } = this.props;
+    return _template(text);
   }
 }
 

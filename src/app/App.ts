@@ -1,9 +1,10 @@
 import { Chats } from '@pages/Chats';
+import _template from '@shared/lib/components/_templator';
 import Component from '@shared/lib/components/Component';
-import Handlebars from 'handlebars';
+
 class App extends Component {
   override render() {
-    return this.compile(Handlebars.compile('{{{Chats}}}'), this.props);
+    return _template('{{{Chats}}}');
   }
 }
 

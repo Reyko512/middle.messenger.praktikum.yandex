@@ -3,17 +3,17 @@ import Chats from './Chats.hbs';
 import { Link } from '@shared/ui/Link';
 
 class ChatsPage extends Component {
-  constructor(props: Record<string, unknown>) {
+  constructor() {
     super('div', {
-      SettingsLink: new Link('div', { text: 'settings', href: '/user-data' }),
+      // SettingsLink: new Link({ text: 'settings', href: '/user-data' }),
+      SettingsLink: new Link({ href: '/user-data', text: 'settings' }),
     });
   }
 
   override render() {
-    return this.compile(Chats, this.props); // props автоматически + children подставятся
+    return Chats;
   }
 
-  // обновление props родителя можно оставить
   override componentDidUpdate(
     _oldProps: Record<string, unknown>,
     _newProps: Record<string, unknown>,
@@ -25,4 +25,4 @@ class ChatsPage extends Component {
   }
 }
 
-export default new ChatsPage({ linkText: 'settings' });
+export default new ChatsPage();

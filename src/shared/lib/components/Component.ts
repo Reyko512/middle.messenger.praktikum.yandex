@@ -1,12 +1,16 @@
 import EventBus from './EventBus';
-import Handlebars from 'handlebars';
+import Handlebars, { type TemplateDelegate } from 'handlebars';
 import { v4 as makeUID } from 'uuid';
 
-interface IProps {
-  [key: string]: unknown;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  events?: { [key: string]: Function };
+type EventsMap = Record<string, EventListener>;
+interface IProps extends Record<string, unknown> {
+  className?: string;
+  attrs?: Record<string, string>;
+  events?: EventsMap;
 }
+type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
+};
 export default abstract class Component<TProps extends IProps = Record<string, unknown>> {
   static EVENTS = {
     INIT: 'init',
@@ -63,13 +67,15 @@ export default abstract class Component<TProps extends IProps = Record<string, u
   _init() {
     this._createResources();
 
+    this._applyAttributes();
+
     this.eventBus().emit(Component.EVENTS.RENDER);
   }
 
   _beforeMounted() {}
 
-  _mounted() {
-    this.componentDidMount({});
+  _mounted(oldProps: TProps) {
+    this.componentDidMount(oldProps);
     if (!this.children) return;
 
     Object.values(this.children).forEach((child) => child.dispatchComponentDidMount());
@@ -94,13 +100,15 @@ export default abstract class Component<TProps extends IProps = Record<string, u
   _render() {
     const block = this.render();
 
+    const compiledBlock = this.compile(block, this.props);
+
     if (!this._element) throw new Error('no element to render!');
 
     this._removeEvents();
 
     this._element.innerHTML = '';
 
-    this._element.appendChild(block);
+    this._element.appendChild(compiledBlock);
 
     this._addEvents();
   }
@@ -133,16 +141,20 @@ export default abstract class Component<TProps extends IProps = Record<string, u
   }
 
   _makePropsProxy(props: TProps) {
-    return new Proxy(props, {
+    return new Proxy(props as Mutable<TProps>, {
       set: (target, key, newValue: unknown) => {
-        target[key] = newValue;
+        if (typeof key === 'string') {
+          (target as Record<string, unknown>)[key] = newValue;
+        }
 
         this.eventBus().emit(Component.EVENTS.UPDATED, { ...target }, target);
         return true;
       },
 
       get: (target, key) => {
-        const value = target[key.toString()];
+        const store = target as Record<string | symbol, unknown>;
+
+        const value = store[key.toString()];
         return typeof value === 'function' ? value.bind(target) : value;
       },
 
@@ -152,9 +164,21 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     });
   }
 
-  _getChildren(propsAndChildren: Record<string, unknown>) {
+  _applyAttributes() {
+    const { className, attrs } = this.props;
+
+    if (className) {
+      this._element!.className = className;
+    }
+
+    if (attrs) {
+      Object.entries(attrs).forEach(([k, v]) => this._element!.setAttribute(k, String(v)));
+    }
+  }
+
+  _getChildren(propsAndChildren: IProps) {
     const children = {} as Record<string, Component>;
-    const props = {} as TProps;
+    const props = {} as Record<string, unknown>;
 
     Object.entries(propsAndChildren).forEach(([key, value]) => {
       if (value instanceof Component) {
@@ -164,7 +188,7 @@ export default abstract class Component<TProps extends IProps = Record<string, u
       }
     });
 
-    return { children, props };
+    return { children, props: props as TProps };
   }
 
   compile(template: Handlebars.TemplateDelegate, props: Record<string, unknown>): DocumentFragment {
@@ -198,15 +222,15 @@ export default abstract class Component<TProps extends IProps = Record<string, u
   }
 
   _addEvents() {
-    if (!this.props['events']) return;
+    const { events = {} } = this.props;
 
-    Object.entries(this.props['events']).forEach(([event, handler]) => {
+    Object.entries(events).forEach(([event, handler]) => {
       this._element!.addEventListener(event, handler);
     });
   }
 
   //user overrides
-  abstract render(): DocumentFragment | HTMLElement;
+  abstract render(): TemplateDelegate;
 
   beforeMount() {}
 
@@ -217,7 +241,7 @@ export default abstract class Component<TProps extends IProps = Record<string, u
   }
 
   dispatchComponentDidMount() {
-    this.eventBus().emit(Component.EVENTS.MOUNT);
+    this.eventBus().emit(Component.EVENTS.MOUNT, this.props);
   }
 
   beforeComponentUnmount() {}
