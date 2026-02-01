@@ -1,5 +1,4 @@
 import Avatar from './Avatar/Avatar.hbs';
-import Button from './Button/Button.hbs';
 import FileInput from './FileInput/FileInput.hbs';
 import Input from './Input/Input.hbs';
 import Link from './Link/Link.hbs';
@@ -11,7 +10,6 @@ import Modal from './Modal/Modal.hbs';
 
 export default {
   Avatar,
-  Button,
   ButtonSend,
   FileInput,
   Input,

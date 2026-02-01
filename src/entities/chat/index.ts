@@ -1,1 +1,1 @@
-export { default as ChatItem } from './ui/chat-item.hbs';
+export { default as ChatItem } from './ui/ChatItem';

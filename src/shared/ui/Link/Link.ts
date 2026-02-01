@@ -11,7 +11,7 @@ class Link extends Component<ILinkProps> {
       ...props,
       attrs: {
         href: props.href ?? '#',
-        class: props.className ?? 'link',
+        class: props.className ? `link ${props.className}` : 'link',
       },
     });
   }

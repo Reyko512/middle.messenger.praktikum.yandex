@@ -1,12 +1,13 @@
 import { Chats } from '@pages/Chats/';
-import Auth from '@pages/Auth/Auth.hbs';
-import Register from '@pages/Register/Register.hbs';
+// import Auth from '@pages/Auth/Auth.hbs';
+// import Register from '@pages/Register/Register.hbs';
 import _404 from '@pages/_404/404.hbs';
 import _500 from '@pages/_500/500.hbs';
 
-import { default as UserModal } from '@widgets/UserModal/UserModal.hbs';
-import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/ChangePasswordModal.hbs';
-import { default as ChangeCommonInfoModal } from '@widgets/ChangeCommonInfoModal/ChangeCommonInfoModal.hbs';
+// import { default as UserModal } from '@widgets/UserModal/UserModal.hbs';
+// import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/ChangePasswordModal.hbs';
+// import { default as ChangeCommonInfoModal } from '@widgets/ChangeCommonInfoModal/ChangeCommonInfoModal.hbs';
+import type Component from '@shared/lib/components/Component';
 
 enum COMPONENTS_NAMES {
   'Chats' = 'Chats',
@@ -19,15 +20,15 @@ enum COMPONENTS_NAMES {
   'ChangeCommonInfoModal' = 'ChangeCommonInfoModal',
 }
 
-const Templates = new Map<COMPONENTS_NAMES, typeof Chats>([
+const Templates = new Map<COMPONENTS_NAMES, Component>([
   [COMPONENTS_NAMES.Chats, Chats],
-  [COMPONENTS_NAMES._404, _404],
-  [COMPONENTS_NAMES.Auth, Auth],
-  [COMPONENTS_NAMES._500, _500],
-  [COMPONENTS_NAMES.Register, Register],
-  [COMPONENTS_NAMES.UserModal, UserModal],
-  [COMPONENTS_NAMES.ChangePasswordModal, ChangePasswordModal],
-  [COMPONENTS_NAMES.ChangeCommonInfoModal, ChangeCommonInfoModal],
+  // [COMPONENTS_NAMES._404, _404],
+  // [COMPONENTS_NAMES.Auth, Auth],
+  // [COMPONENTS_NAMES._500, _500],
+  // [COMPONENTS_NAMES.Register, Register],
+  // [COMPONENTS_NAMES.UserModal, UserModal],
+  // [COMPONENTS_NAMES.ChangePasswordModal, ChangePasswordModal],
+  // [COMPONENTS_NAMES.ChangeCommonInfoModal, ChangeCommonInfoModal],
 ]);
 
 export default function renderRoute() {
@@ -36,28 +37,27 @@ export default function renderRoute() {
 
   switch (path) {
     case '':
-      console.log(Templates.get(COMPONENTS_NAMES.Chats)?.getContent());
-      return Templates.get(COMPONENTS_NAMES.Chats)?.getContent();
+      return Templates.get(COMPONENTS_NAMES.Chats);
 
     case 'sign-in':
-      return Templates.get(COMPONENTS_NAMES.Auth)?.call({}, {});
+      return Templates.get(COMPONENTS_NAMES.Auth);
 
     case 'sign-up':
-      return Templates.get(COMPONENTS_NAMES.Register)?.call({}, {});
+      return Templates.get(COMPONENTS_NAMES.Register);
 
     case '500':
-      return Templates.get(COMPONENTS_NAMES._500)?.call({}, {});
+      return Templates.get(COMPONENTS_NAMES._500);
 
     case 'user-data':
-      return Templates.get(COMPONENTS_NAMES.UserModal)?.call({}, {});
+      return Templates.get(COMPONENTS_NAMES.UserModal);
 
     case 'change-password':
-      return Templates.get(COMPONENTS_NAMES.ChangePasswordModal)?.call({}, {});
+      return Templates.get(COMPONENTS_NAMES.ChangePasswordModal);
 
     case 'change-info':
-      return Templates.get(COMPONENTS_NAMES.ChangeCommonInfoModal)?.call({}, {});
+      return Templates.get(COMPONENTS_NAMES.ChangeCommonInfoModal);
 
     default:
-      return Templates.get(COMPONENTS_NAMES._404)?.call({}, {});
+      return Templates.get(COMPONENTS_NAMES._404);
   }
 }

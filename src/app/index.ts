@@ -7,15 +7,12 @@ import.meta.glob('@features/**/*.scss', { eager: true });
 import './assets/styles/index.scss';
 import App from './App';
 
-import widgets from '@widgets/index';
 import sharedUi from '@shared/ui';
-import entities from '@entities/index';
-import features from '@features/index';
 import registerComponents from '@shared/lib/components/registerComponents';
 
 import { render } from '@shared/lib/components/renderDom';
 
-registerComponents(widgets, sharedUi, entities, features);
+registerComponents(sharedUi);
 document.addEventListener('DOMContentLoaded', () => {
   render('#app', App);
 });

@@ -13,15 +13,17 @@ type Mutable<T> = {
 };
 export default abstract class Component<TProps extends IProps = Record<string, unknown>> {
   static EVENTS = {
+    BEFORE_INIT: 'before-init',
     INIT: 'init',
+    BEFORE_MOUNT: 'before-mount',
     MOUNT: 'mount',
     UPDATED: 'updated',
     UNMOUNTED: 'unmounted',
     RENDER: 'render',
   };
 
-  _element: HTMLElement | null = null;
-  _meta: {
+  private _element: HTMLElement | null = null;
+  private _meta: {
     tagName: string;
     props: TProps;
   } | null = null;
@@ -43,6 +45,7 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     } as typeof this.settings,
   ) {
     const eventBus = new EventBus();
+
     const { children, props } = this._getChildren(propsAndChildren);
 
     this._meta = {
@@ -60,44 +63,52 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     this.eventBus = () => eventBus;
 
     this._registerEvents(eventBus);
+
+    eventBus.emit(Component.EVENTS.BEFORE_INIT);
     eventBus.emit(Component.EVENTS.INIT);
   }
 
   //system
-  _init() {
+  _beforeInit() {}
+
+  private _init() {
     this._createResources();
 
     this._applyAttributes();
 
     this.eventBus().emit(Component.EVENTS.RENDER);
+    this.eventBus().emit(Component.EVENTS.BEFORE_MOUNT);
+    this.eventBus().emit(Component.EVENTS.MOUNT);
   }
 
-  _beforeMounted() {}
+  private _beforeMounted() {
+    this.beforeMount();
+  }
 
-  _mounted(oldProps: TProps) {
+  private _mounted(oldProps: TProps) {
     this.componentDidMount(oldProps);
     if (!this.children) return;
 
     Object.values(this.children).forEach((child) => child.dispatchComponentDidMount());
   }
 
-  _updated(_oldProps: TProps, newProps: TProps) {
+  private _updated(_oldProps: TProps, newProps: TProps) {
     const response = this.componentDidUpdate(_oldProps, newProps);
 
-    if (!response) {
+    if (!response || _oldProps === newProps) {
       return;
     }
 
     this._render();
   }
 
-  _beforeUnmounted() {}
+  // private _beforeUnmounted() {}
 
-  _unmounted() {
+  private _unmounted() {
     this.componentDidUnmount();
   }
 
-  _render() {
+  private _render() {
     const block = this.render();
 
     const compiledBlock = this.compile(block, this.props);
@@ -115,15 +126,17 @@ export default abstract class Component<TProps extends IProps = Record<string, u
 
   //utils
 
-  _registerEvents(eventBus: EventBus) {
+  private _registerEvents(eventBus: EventBus) {
     eventBus.on(Component.EVENTS.INIT, this._init.bind(this));
+    eventBus.on(Component.EVENTS.BEFORE_INIT, this._beforeInit.bind(this));
+    eventBus.on(Component.EVENTS.BEFORE_MOUNT, this._beforeMounted.bind(this));
     eventBus.on(Component.EVENTS.MOUNT, this._mounted.bind(this));
     eventBus.on(Component.EVENTS.UPDATED, this._updated.bind(this));
     eventBus.on(Component.EVENTS.UNMOUNTED, this._unmounted.bind(this));
     eventBus.on(Component.EVENTS.RENDER, this._render.bind(this));
   }
 
-  _createDocumentElement(tagName: string) {
+  private _createDocumentElement(tagName: string) {
     const element = document.createElement(tagName);
 
     if (this.settings.withInternalId) {
@@ -133,21 +146,23 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     return element;
   }
 
-  _createResources() {
+  private _createResources() {
     if (!this._meta) throw new Error('no meta');
 
     const { tagName } = this._meta;
     this._element = this._createDocumentElement(tagName);
   }
 
-  _makePropsProxy(props: TProps) {
+  private _makePropsProxy(props: TProps) {
     return new Proxy(props as Mutable<TProps>, {
       set: (target, key, newValue: unknown) => {
+        const oldProps = { ...target };
+
         if (typeof key === 'string') {
           (target as Record<string, unknown>)[key] = newValue;
         }
 
-        this.eventBus().emit(Component.EVENTS.UPDATED, { ...target }, target);
+        this.eventBus().emit(Component.EVENTS.UPDATED, oldProps, target);
         return true;
       },
 
@@ -164,7 +179,7 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     });
   }
 
-  _applyAttributes() {
+  private _applyAttributes() {
     const { className, attrs } = this.props;
 
     if (className) {
@@ -176,7 +191,7 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     }
   }
 
-  _getChildren(propsAndChildren: IProps) {
+  private _getChildren(propsAndChildren: IProps) {
     const children = {} as Record<string, Component>;
     const props = {} as Record<string, unknown>;
 
@@ -191,7 +206,10 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     return { children, props: props as TProps };
   }
 
-  compile(template: Handlebars.TemplateDelegate, props: Record<string, unknown>): DocumentFragment {
+  private compile(
+    template: Handlebars.TemplateDelegate,
+    props: Record<string, unknown>,
+  ): DocumentFragment {
     const propsAndStubs = { ...props };
 
     Object.entries(this.children).forEach(([key, child]) => {
@@ -213,7 +231,7 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     return fragment.content;
   }
 
-  _removeEvents() {
+  private _removeEvents() {
     if (!this.props['events']) return;
 
     Object.entries(this.props['events']).forEach(([event, handler]) => {
@@ -221,7 +239,7 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     });
   }
 
-  _addEvents() {
+  private _addEvents() {
     const { events = {} } = this.props;
 
     Object.entries(events).forEach(([event, handler]) => {
@@ -229,26 +247,35 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     });
   }
 
+  public createChildren<T>(data: T[] | undefined | null, ComponentClass: (props: T) => Component) {
+    this.children = {};
+
+    data?.forEach((item) => {
+      const child = ComponentClass(item);
+      this.children[child.__id as string] = child;
+    });
+  }
+
   //user overrides
-  abstract render(): TemplateDelegate;
+  public abstract render(): TemplateDelegate;
 
-  beforeMount() {}
+  public beforeMount() {}
 
-  componentDidMount(_oldProps: TProps) {}
+  public componentDidMount(_oldProps: TProps) {}
 
-  componentDidUpdate(_oldProps: TProps, _newProps: TProps) {
+  public componentDidUpdate(_oldProps: TProps, _newProps: TProps) {
     return true;
   }
 
-  dispatchComponentDidMount() {
+  public dispatchComponentDidMount() {
     this.eventBus().emit(Component.EVENTS.MOUNT, this.props);
   }
 
-  beforeComponentUnmount() {}
-  componentDidUnmount() {}
+  public beforeComponentUnmount() {}
+  public componentDidUnmount() {}
 
   //public
-  setProps = (nextProps: Record<string, unknown>) => {
+  public setProps = (nextProps: Record<string, unknown>) => {
     if (!nextProps) {
       return;
     }
@@ -256,11 +283,17 @@ export default abstract class Component<TProps extends IProps = Record<string, u
     Object.assign(this.props, nextProps);
   };
 
-  get element() {
+  public get element() {
     return this._element;
   }
 
-  getContent() {
+  public getContent() {
     return this.element;
+  }
+
+  public getChildrenString() {
+    return Object.values(this.children)
+      .map((c) => `<template data-id="${c.__id}"></template>`)
+      .join('');
   }
 }
