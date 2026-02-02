@@ -8,6 +8,7 @@ import _500 from '@pages/_500/500.hbs';
 // import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/ChangePasswordModal.hbs';
 // import { default as ChangeCommonInfoModal } from '@widgets/ChangeCommonInfoModal/ChangeCommonInfoModal.hbs';
 import type Component from '@shared/lib/components/Component';
+import { UserModal } from '@widgets/UserModal';
 
 enum COMPONENTS_NAMES {
   'Chats' = 'Chats',
@@ -26,7 +27,7 @@ const Templates = new Map<COMPONENTS_NAMES, Component>([
   // [COMPONENTS_NAMES.Auth, Auth],
   // [COMPONENTS_NAMES._500, _500],
   // [COMPONENTS_NAMES.Register, Register],
-  // [COMPONENTS_NAMES.UserModal, UserModal],
+  [COMPONENTS_NAMES.UserModal, UserModal()],
   // [COMPONENTS_NAMES.ChangePasswordModal, ChangePasswordModal],
   // [COMPONENTS_NAMES.ChangeCommonInfoModal, ChangeCommonInfoModal],
 ]);
