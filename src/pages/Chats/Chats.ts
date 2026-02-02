@@ -30,16 +30,6 @@ class ChatsPage extends Component {
   override render() {
     return Chats;
   }
-
-  override componentDidUpdate(
-    _oldProps: Record<string, unknown>,
-    _newProps: Record<string, unknown>,
-  ): boolean {
-    if (_oldProps['linkText'] !== _newProps['linkText']) {
-      this.children['SettingsLink']?.setProps({ text: _newProps['linkText'] });
-    }
-    return true;
-  }
 }
 
 export default new ChatsPage();
