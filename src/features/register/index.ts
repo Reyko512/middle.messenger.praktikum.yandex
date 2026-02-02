@@ -1,1 +1,1 @@
-export { default as RegisterForm } from "./ui/RegisterForm.hbs";
+export { default as RegisterForm } from './ui/RegisterForm';

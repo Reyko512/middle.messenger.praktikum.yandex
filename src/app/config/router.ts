@@ -1,10 +1,9 @@
 import { Chats } from '@pages/Chats/';
-// import Auth from '@pages/Auth/Auth.hbs';
-// import Register from '@pages/Register/Register.hbs';
-import _404 from '@pages/_404/404.hbs';
-import _500 from '@pages/_500/500.hbs';
+import Auth from '@pages/Auth/Auth';
+import Register from '@pages/Register/Register';
+import _404 from '@pages/_404/_404';
+import _500 from '@pages/_500/_500';
 
-// import { default as UserModal } from '@widgets/UserModal/UserModal.hbs';
 import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/ChangePasswordModal';
 import { ChangeCommonInfoModal } from '@widgets/ChangeCommonInfoModal/';
 import type Component from '@shared/lib/components/Component';
@@ -23,10 +22,10 @@ enum COMPONENTS_NAMES {
 
 const Templates = new Map<COMPONENTS_NAMES, Component>([
   [COMPONENTS_NAMES.Chats, Chats],
-  // [COMPONENTS_NAMES._404, _404],
-  // [COMPONENTS_NAMES.Auth, Auth],
-  // [COMPONENTS_NAMES._500, _500],
-  // [COMPONENTS_NAMES.Register, Register],
+  [COMPONENTS_NAMES._404, _404],
+  [COMPONENTS_NAMES.Auth, new Auth()],
+  [COMPONENTS_NAMES._500, _500],
+  [COMPONENTS_NAMES.Register, new Register()],
   [COMPONENTS_NAMES.UserModal, UserModal()],
   [COMPONENTS_NAMES.ChangePasswordModal, ChangePasswordModal()],
   [COMPONENTS_NAMES.ChangeCommonInfoModal, ChangeCommonInfoModal()],

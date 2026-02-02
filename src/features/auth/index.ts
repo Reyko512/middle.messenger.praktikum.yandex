@@ -1,1 +1,1 @@
-export { default as AuthForm } from "./ui/AuthForm.hbs";
+export { default as AuthForm } from './ui/AuthForm';
