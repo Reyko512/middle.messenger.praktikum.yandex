@@ -1,3 +1,13 @@
+import type { FormValidator } from '@shared/lib/form/formValidator';
+import {
+  required,
+  personName,
+  login,
+  phone,
+  email,
+  password,
+} from '@shared/lib/form/validationRules';
+
 type Input = {
   label: string;
   id: string;
@@ -57,3 +67,19 @@ export const registerFormInputs: Input[] = [
     value: '',
   },
 ];
+
+export const setValidationRules = (value: FormValidator) => {
+  value
+    .addRule('first_name', required())
+    .addRule('second_name', required())
+    .addRule('first_name', personName)
+    .addRule('second_name', personName)
+    .addRule('login', required())
+    .addRule('login', login)
+    .addRule('phone', required())
+    .addRule('phone', phone)
+    .addRule('email', required())
+    .addRule('email', email)
+    .addRule('password', password)
+    .addRule('password', required());
+};

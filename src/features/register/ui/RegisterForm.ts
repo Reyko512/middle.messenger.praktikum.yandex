@@ -15,7 +15,15 @@ export default class RegisterForm extends Component {
       },
 
       inputs: registerFormInputs.map((item) => new Input(item)),
-      Button: new Button({ text: 'Sign up', type: 'submit' }),
+      Button: new Button({
+        text: 'Sign up',
+        type: 'submit',
+        events: {
+          click: (e: Event) => {
+            e.preventDefault();
+          },
+        },
+      }),
       Link: new Link({
         text: 'Sign in',
         href: '/sign-in',

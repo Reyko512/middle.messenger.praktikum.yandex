@@ -10,6 +10,7 @@ interface InputProps extends Record<string, unknown> {
   error?: string;
   autocomplete?: string;
   className?: string;
+  events?: Record<string, EventListener>;
 }
 
 export default class Input extends Component<InputProps> {
@@ -19,10 +20,14 @@ export default class Input extends Component<InputProps> {
       attrs: {
         class: props.className ? `input ${props.className}` : 'input',
       },
+      events: props.events ?? {},
     });
   }
 
-  public override componentDidUpdate(_oldProps: InputProps, _newProps: InputProps): boolean {
+  public override componentDidUpdate(
+    _oldProps: InputProps,
+    _newProps: InputProps,
+  ): boolean {
     if (_oldProps.value === _newProps.value) {
       this.props.className = _newProps.value.length ? '_filled' : '';
     }
