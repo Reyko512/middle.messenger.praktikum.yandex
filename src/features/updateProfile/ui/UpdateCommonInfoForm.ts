@@ -1,10 +1,10 @@
 import Component from '@shared/lib/components/Component';
-import UpdateCommonInfoFormTemp from './UpdateCommonInfoForm.hbs';
 
 import type { TemplateDelegate } from 'handlebars';
 import { Button } from '@shared/ui/Button';
 import { inputsUpdateCommonInfo } from '../model/updateCommonInfoForm';
 import { Input } from '@shared/ui/Input';
+import _template from '@shared/lib/components/_templator';
 
 export default class UpdateCommonInfoForm extends Component {
   constructor() {
@@ -19,6 +19,6 @@ export default class UpdateCommonInfoForm extends Component {
   }
 
   public override render(): TemplateDelegate {
-    return UpdateCommonInfoFormTemp;
+    return _template('{{{inputs}}}{{{Button}}}');
   }
 }

@@ -5,7 +5,7 @@ import _404 from '@pages/_404/404.hbs';
 import _500 from '@pages/_500/500.hbs';
 
 // import { default as UserModal } from '@widgets/UserModal/UserModal.hbs';
-// import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/ChangePasswordModal.hbs';
+import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/ChangePasswordModal';
 import { ChangeCommonInfoModal } from '@widgets/ChangeCommonInfoModal/';
 import type Component from '@shared/lib/components/Component';
 import { UserModal } from '@widgets/UserModal';
@@ -28,7 +28,7 @@ const Templates = new Map<COMPONENTS_NAMES, Component>([
   // [COMPONENTS_NAMES._500, _500],
   // [COMPONENTS_NAMES.Register, Register],
   [COMPONENTS_NAMES.UserModal, UserModal()],
-  // [COMPONENTS_NAMES.ChangePasswordModal, ChangePasswordModal],
+  [COMPONENTS_NAMES.ChangePasswordModal, ChangePasswordModal()],
   [COMPONENTS_NAMES.ChangeCommonInfoModal, ChangeCommonInfoModal()],
 ]);
 
