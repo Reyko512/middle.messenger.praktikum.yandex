@@ -1,8 +1,8 @@
 import { Chats } from '@pages/Chats/';
-import Auth from '@pages/Auth/Auth';
-import Register from '@pages/Register/Register';
-import _404 from '@pages/_404/_404';
-import _500 from '@pages/_500/_500';
+import { Auth } from '@pages/Auth/';
+import { Register } from '@pages/Register/';
+import { _404 } from '@pages/_404/';
+import { _500 } from '@pages/_500/';
 
 import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/ChangePasswordModal';
 import { ChangeCommonInfoModal } from '@widgets/ChangeCommonInfoModal/';
