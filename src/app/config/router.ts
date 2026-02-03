@@ -31,33 +31,49 @@ const Templates = new Map<COMPONENTS_NAMES, Component>([
   [COMPONENTS_NAMES.ChangeCommonInfoModal, ChangeCommonInfoModal()],
 ]);
 
-export default function renderRoute() {
+export default function renderRoute(): Component<Record<string, unknown>> {
   const hash = window.location.pathname.split('/');
   const path = hash[hash.length - 1] ?? '';
 
   switch (path) {
     case '':
-      return Templates.get(COMPONENTS_NAMES.Chats);
+      return Templates.get(COMPONENTS_NAMES.Chats) as Component<
+        Record<string, unknown>
+      >;
 
     case 'sign-in':
-      return Templates.get(COMPONENTS_NAMES.Auth);
+      return Templates.get(COMPONENTS_NAMES.Auth) as Component<
+        Record<string, unknown>
+      >;
 
     case 'sign-up':
-      return Templates.get(COMPONENTS_NAMES.Register);
+      return Templates.get(COMPONENTS_NAMES.Register) as Component<
+        Record<string, unknown>
+      >;
 
     case '500':
-      return Templates.get(COMPONENTS_NAMES._500);
+      return Templates.get(COMPONENTS_NAMES._500) as Component<
+        Record<string, unknown>
+      >;
 
     case 'user-data':
-      return Templates.get(COMPONENTS_NAMES.UserModal);
+      return Templates.get(COMPONENTS_NAMES.UserModal) as Component<
+        Record<string, unknown>
+      >;
 
     case 'change-password':
-      return Templates.get(COMPONENTS_NAMES.ChangePasswordModal);
+      return Templates.get(
+        COMPONENTS_NAMES.ChangePasswordModal,
+      ) as Component<Record<string, unknown>>;
 
     case 'change-info':
-      return Templates.get(COMPONENTS_NAMES.ChangeCommonInfoModal);
+      return Templates.get(
+        COMPONENTS_NAMES.ChangeCommonInfoModal,
+      ) as Component<Record<string, unknown>>;
 
     default:
-      return Templates.get(COMPONENTS_NAMES._404);
+      return Templates.get(COMPONENTS_NAMES._404) as Component<
+        Record<string, unknown>
+      >;
   }
 }
