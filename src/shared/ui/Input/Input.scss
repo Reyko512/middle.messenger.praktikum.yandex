@@ -6,6 +6,8 @@
   color: var(--floating-white);
   width: 100%;
 
+  $root: &;
+
   @include flex-column;
 
   &__label {
@@ -50,6 +52,10 @@
   &._error {
     color: var(--primary-error);
 
+    .input__error {
+      transition: all 0.1s;
+    }
+
     .input__label {
       color: var(--primary-error);
     }
@@ -57,6 +63,30 @@
     .input__field {
       color: var(--primary-error);
       border-color: var(--primary-error);
+    }
+
+    &:not(:focus-within, ._filled) {
+      .input__error {
+        transform: translateY(-14px);
+      }
+    }
+  }
+
+  &._filled {
+    #{$root}__label {
+      transform: translate(12px, 0);
+      font-size: 12px;
+    }
+
+    &:not(._error) {
+      #{$root}__field {
+        color: var(--white);
+        border-color: var(--white);
+      }
+
+      #{$root}__label {
+        color: var(--white);
+      }
     }
   }
 }

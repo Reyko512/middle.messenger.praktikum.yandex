@@ -70,16 +70,10 @@ export const registerFormInputs: Input[] = [
 
 export const setValidationRules = (value: FormValidator) => {
   value
-    .addRule('first_name', required())
-    .addRule('second_name', required())
-    .addRule('first_name', personName)
-    .addRule('second_name', personName)
-    .addRule('login', required())
-    .addRule('login', login)
-    .addRule('phone', required())
-    .addRule('phone', phone)
-    .addRule('email', required())
-    .addRule('email', email)
-    .addRule('password', password)
-    .addRule('password', required());
+    .addRule('first_name', required(), personName)
+    .addRule('second_name', required(), personName)
+    .addRule('login', required(), login)
+    .addRule('phone', required(), phone)
+    .addRule('email', required(), email)
+    .addRule('password', required(), password);
 };

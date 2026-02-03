@@ -1,46 +1,38 @@
-export interface FormField {
-  name: string;
-  value: unknown;
-}
-
 export type ValidatorRule<T = unknown> = (value: T) => string | null;
 
-type ValidationResult = {
-  isValid: boolean;
-  errors: Record<string, string>;
-};
-
 export class FormValidator {
-  private fields: FormField[];
-  private rules: Record<string, ValidatorRule[]>;
+  private rules: Record<string, ValidatorRule[]> = {};
 
-  constructor(fields: FormField[]) {
-    this.fields = fields;
-    this.rules = {};
-  }
+  public addRule(field: string, ...rules: ValidatorRule[]): this {
+    if (!rules.length) return this;
 
-  public addRule(fieldName: string, rule: ValidatorRule): this {
-    if (!this.rules[fieldName]) {
-      this.rules[fieldName] = [];
+    if (!this.rules[field]) {
+      this.rules[field] = [];
     }
 
-    this.rules[fieldName].push(rule);
+    this.rules[field].push(...rules);
     return this;
   }
 
-  public validate(): ValidationResult {
+  private runRules(field: string, value: unknown): string | null {
+    const rules = this.rules[field];
+    if (!rules) return null;
+
+    for (const rule of rules) {
+      const error = rule(value);
+      if (error) return error;
+    }
+
+    return null;
+  }
+
+  public validate(values: Record<string, unknown>) {
     const errors: Record<string, string> = {};
 
-    for (const field of this.fields) {
-      const fieldRules = this.rules[field.name];
-      if (!fieldRules) continue;
-
-      for (const rule of fieldRules) {
-        const error = rule(field.value);
-        if (error) {
-          errors[field.name] = error;
-          break;
-        }
+    for (const field of Object.keys(this.rules)) {
+      const error = this.runRules(field, values[field]);
+      if (error) {
+        errors[field] = error;
       }
     }
 
@@ -48,5 +40,9 @@ export class FormValidator {
       isValid: Object.keys(errors).length === 0,
       errors,
     };
+  }
+
+  public validateField(field: string, value: unknown): string | null {
+    return this.runRules(field, value);
   }
 }

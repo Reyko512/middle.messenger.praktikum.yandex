@@ -1,26 +1,38 @@
 import Component from '@shared/lib/components/Component';
 import { Button } from '@shared/ui/Button';
 import { Link } from '@shared/ui/Link';
-import { registerFormInputs } from '../model/registerForm';
-import { Input } from '@shared/ui/Input';
+import {
+  registerFormInputs,
+  setValidationRules,
+} from '../model/registerForm';
 import RegisterFormTemp from './RegisterForm.hbs';
 import type { TemplateDelegate } from 'handlebars';
+import { FormController } from '@shared/lib/form/formController';
 
 export default class RegisterForm extends Component {
+  formController: FormController | undefined;
+  controller: FormController;
+
   constructor() {
+    const controller = new FormController(registerFormInputs);
+    controller.addRules(setValidationRules);
+
     super('form', {
       attrs: {
         class: 'registration-form',
         action: '#',
       },
-
-      inputs: registerFormInputs.map((item) => new Input(item)),
+      inputs: controller.inputs,
       Button: new Button({
         text: 'Sign up',
         type: 'submit',
         events: {
           click: (e: Event) => {
             e.preventDefault();
+            console.log('SUBMIT');
+            this.controller.submit((values) => {
+              console.log(values);
+            });
           },
         },
       }),
@@ -29,6 +41,8 @@ export default class RegisterForm extends Component {
         href: '/sign-in',
       }),
     });
+
+    this.controller = controller;
   }
 
   public override render(): TemplateDelegate {

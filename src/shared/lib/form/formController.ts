@@ -1,64 +1,76 @@
-import { FormValidator, type FormField } from './formValidator';
+import { Input } from '@shared/ui/Input/';
+import { FormValidator } from './formValidator';
 
-interface ControlledInput {
-  props: {
-    name: string;
-    value: unknown;
-  };
-  setProps(next: Record<string, unknown>): void;
-}
-
-type InputsMap = Record<string, ControlledInput>;
+type FieldConfig = {
+  name: string;
+  type: string;
+  value?: string;
+};
 
 export class FormController {
-  private inputs: InputsMap;
-  private validator: FormValidator;
+  private values: Record<string, string> = {};
+  private validator = new FormValidator();
 
-  constructor(inputs: ControlledInput[]) {
-    this.inputs = {};
+  public readonly inputs: Input[];
 
-    inputs.forEach((input) => {
-      this.inputs[input.props.name] = input;
+  constructor(fields: FieldConfig[]) {
+    this.inputs = fields.map((field) => {
+      this.values[field.name] = field.value ?? '';
+
+      const input: Input = new Input({
+        ...field,
+        value: this.values[field.name] ?? '',
+        error: '',
+        events: {
+          input: (e: Event) => {
+            const value = (e.target as HTMLInputElement).value;
+
+            this.values[field.name] = value;
+            input.setProps({ value });
+          },
+
+          focusout: () => {
+            console.log('blured', field.name, field.value);
+            this.validateField(field.name);
+          },
+        },
+      });
+
+      return input;
     });
-
-    this.validator = new FormValidator(this.getFields());
   }
 
-  private getFields(): FormField[] {
-    return Object.values(this.inputs).map((input) => ({
-      name: input.props.name,
-      value: input.props.value,
-    }));
-  }
-
-  public setRules(configure: (validator: FormValidator) => void) {
+  public addRules(configure: (validator: FormValidator) => void) {
     configure(this.validator);
   }
 
-  public updateField(name: string, value: unknown) {
-    const input = this.inputs[name];
-    if (!input) return;
-
-    input.setProps({ value });
-
-    this.validator = new FormValidator(this.getFields());
-  }
-
   public validate() {
-    const result = this.validator.validate();
+    const result = this.validator.validate(this.values);
 
-    Object.entries(this.inputs).forEach(([name, input]) => {
+    this.inputs.forEach((input) => {
       input.setProps({
-        error: result.errors[name] ?? '',
+        error: result.errors[input.props.name as string] ?? '',
       });
     });
 
     return result;
   }
 
-  public getValues(): Record<string, unknown> {
-    return Object.fromEntries(
-      Object.values(this.inputs).map((i) => [i.props.name, i.props.value]),
-    );
+  private validateField(name: string) {
+    const result = this.validator.validateField(name, this.values[name]);
+    this.inputs.forEach((input) => {
+      if (input.props.name === name) {
+        input.setProps({
+          error: result ?? '',
+        });
+      }
+    });
+  }
+
+  public submit(onValid: (values: Record<string, string>) => void) {
+    const result = this.validate();
+    if (result.isValid) {
+      onValid({ ...this.values });
+    }
   }
 }

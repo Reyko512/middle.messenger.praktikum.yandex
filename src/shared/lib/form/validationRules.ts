@@ -2,64 +2,66 @@ import type { ValidatorRule } from './formValidator';
 
 const isString = (v: unknown): v is string => typeof v === 'string';
 
-const match =
-  (regex: RegExp, message: string): ValidatorRule =>
-  (value) =>
-    isString(value) && regex.test(value) ? null : message;
-
-export const lengthBetween =
-  (min: number, max: number, message: string): ValidatorRule =>
-  (value) =>
-    isString(value) && value.length >= min && value.length <= max
-      ? null
-      : message;
-
 export const required =
-  (message = 'Required'): ValidatorRule =>
-  (value) =>
-    isString(value) && value.trim() ? null : message;
+  (message = 'This field is required'): ValidatorRule =>
+  (v) =>
+    isString(v) ? (v.trim() ? null : message) : v != null ? null : message;
 
-export const personName: ValidatorRule = match(
-  /^[A-ZА-ЯЁ][a-zа-яё]+(?:-[A-ZА-ЯЁ][a-zа-яё]+)?$/,
-  'Must contain only letters and start whith capital letter',
-);
+export const personName: ValidatorRule = (v) => {
+  if (!isString(v)) return 'Invalid name format';
 
-export const login: ValidatorRule = (value) => {
-  if (!isString(value)) return 'Invalid login';
+  const re = /^[A-ZА-ЯЁ][a-zа-яё]+(?:-[A-ZА-ЯЁ][a-zа-яё]+)?$/u;
+  return re.test(v)
+    ? null
+    : 'Must start with a capital letter and contain only letters or hyphen';
+};
 
-  if (value.length < 3 || value.length > 20)
-    return 'Login must be 3–20 characters';
+export const login: ValidatorRule = (v) => {
+  if (!isString(v)) return 'Invalid login';
 
-  if (!/^[a-zA-Z0-9_-]+$/.test(value))
-    return 'Only latin letters, numbers, "-" and "_" allowed';
+  if (v.length < 3 || v.length > 20)
+    return 'Login must be between 3 and 20 characters';
 
-  if (/^\d+$/.test(value)) return 'Login cannot consist of digits only';
+  if (!/^[a-zA-Z0-9_-]+$/.test(v))
+    return 'Only latin letters, numbers, "-" and "_" are allowed';
+
+  if (/^\d+$/.test(v)) return 'Login cannot consist of digits only';
 
   return null;
 };
 
-export const email: ValidatorRule = match(
-  /^[a-zA-Z0-9_-]+@[a-zA-Z]+\.[a-zA-Z]+$/,
-  'Invalid email format',
-);
+export const email: ValidatorRule = (v) => {
+  if (!isString(v)) return 'Invalid email';
 
-export const password: ValidatorRule = (value) => {
-  if (!isString(value)) return 'Invalid password';
-
-  if (value.length < 8 || value.length > 40)
-    return 'Password must be 8–40 characters';
-
-  if (!/[A-Z]/.test(value))
-    return 'Password must contain an uppercase letter';
-
-  if (!/\d/.test(value)) return 'Password must contain a digit';
+  if (!/^[a-zA-Z0-9._-]+@[a-zA-Z]+\.[a-zA-Z]+$/.test(v))
+    return 'Invalid email format';
 
   return null;
 };
 
-export const phone: ValidatorRule = match(
-  /^\+?\d{10,15}$/,
-  'Phone must contain 10–15 digits',
-);
+export const password: ValidatorRule = (v) => {
+  if (!isString(v)) return 'Invalid password';
 
-export const message: ValidatorRule = required('Message cannot be empty');
+  if (v.length < 8 || v.length > 40)
+    return 'Password must be between 8 and 40 characters';
+
+  if (!/[A-Z]/.test(v))
+    return 'Password must contain at least one uppercase letter';
+
+  if (!/\d/.test(v)) return 'Password must contain at least one digit';
+
+  return null;
+};
+
+export const phone: ValidatorRule = (v) => {
+  if (!isString(v)) return 'Invalid phone number';
+
+  if (!/^\+?\d{10,15}$/.test(v))
+    return 'Phone number must contain 10 to 15 digits and may start with +';
+
+  return null;
+};
+
+export const messageRule: ValidatorRule = required(
+  'Message cannot be empty',
+);
