@@ -29,7 +29,6 @@ export default class RegisterForm extends Component {
         events: {
           click: (e: Event) => {
             e.preventDefault();
-            console.log('SUBMIT');
             this.controller.submit((values) => {
               console.log(values);
             });
