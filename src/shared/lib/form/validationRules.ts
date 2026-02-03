@@ -39,16 +39,21 @@ export const email: ValidatorRule = (v) => {
   return null;
 };
 
-export const password: ValidatorRule = (v) => {
-  if (!isString(v)) return 'Invalid password';
+export const password: ValidatorRule<unknown> = (value) => {
+  if (!value) return 'Password is required';
+  if (typeof value !== 'string') return 'Password shold be a string!';
 
-  if (v.length < 8 || v.length > 40)
+  if (value.length < 8 || value.length > 40) {
     return 'Password must be between 8 and 40 characters';
+  }
 
-  if (!/[A-Z]/.test(v))
+  if (!/[A-Z]/.test(value)) {
     return 'Password must contain at least one uppercase letter';
+  }
 
-  if (!/\d/.test(v)) return 'Password must contain at least one digit';
+  if (!/\d/.test(value)) {
+    return 'Password must contain at least one digit';
+  }
 
   return null;
 };
@@ -65,3 +70,15 @@ export const phone: ValidatorRule = (v) => {
 export const messageRule: ValidatorRule = required(
   'Message cannot be empty',
 );
+
+export const confirmPasswordRule =
+  (passwordField = 'password'): ValidatorRule<unknown> =>
+  (value, values) => {
+    if (!value) return 'Password confirmation is required';
+
+    if (value !== values[passwordField]) {
+      return 'Passwords do not match';
+    }
+
+    return null;
+  };

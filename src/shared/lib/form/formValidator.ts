@@ -1,4 +1,7 @@
-export type ValidatorRule<T = unknown> = (value: T) => string | null;
+export type ValidatorRule<T = unknown> = (
+  value: T,
+  values: Record<string, unknown>,
+) => string | null;
 
 export class FormValidator {
   private rules: Record<string, ValidatorRule[]> = {};
@@ -14,12 +17,17 @@ export class FormValidator {
     return this;
   }
 
-  private runRules(field: string, value: unknown): string | null {
+  private runRules(
+    field: string,
+    values: Record<string, unknown>,
+  ): string | null {
     const rules = this.rules[field];
     if (!rules) return null;
 
+    const value = values[field];
+
     for (const rule of rules) {
-      const error = rule(value);
+      const error = rule(value, values);
       if (error) return error;
     }
 
@@ -30,10 +38,8 @@ export class FormValidator {
     const errors: Record<string, string> = {};
 
     for (const field of Object.keys(this.rules)) {
-      const error = this.runRules(field, values[field]);
-      if (error) {
-        errors[field] = error;
-      }
+      const error = this.runRules(field, values);
+      if (error) errors[field] = error;
     }
 
     return {
@@ -42,7 +48,7 @@ export class FormValidator {
     };
   }
 
-  public validateField(field: string, value: unknown): string | null {
-    return this.runRules(field, value);
+  public validateField(field: string, values: Record<string, unknown>) {
+    return this.runRules(field, values);
   }
 }

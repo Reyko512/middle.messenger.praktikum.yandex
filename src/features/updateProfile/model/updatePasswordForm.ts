@@ -1,3 +1,10 @@
+import type { FormValidator } from '@shared/lib/form/formValidator';
+import {
+  confirmPasswordRule,
+  password,
+  required,
+} from '@shared/lib/form/validationRules';
+
 type Input = {
   label: string;
   id: string;
@@ -33,3 +40,14 @@ export const updatePasswordInputs: Input[] = [
     value: '',
   },
 ];
+
+export const setValidationRules = (value: FormValidator) => {
+  value
+    .addRule('oldPassword', required(), password)
+    .addRule('newPassword', required(), password)
+    .addRule(
+      'confirm-password',
+      required(),
+      confirmPasswordRule('newPassword'),
+    );
+};

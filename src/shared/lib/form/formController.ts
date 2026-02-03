@@ -57,7 +57,7 @@ export class FormController {
   }
 
   private validateField(name: string) {
-    const result = this.validator.validateField(name, this.values[name]);
+    const result = this.validator.validateField(name, this.values);
     this.inputs.forEach((input) => {
       if (input.props.name === name) {
         input.setProps({
