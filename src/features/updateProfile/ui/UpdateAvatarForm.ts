@@ -10,6 +10,20 @@ export default class UpdateAvatarForm extends Component {
         class: 'update-avatar-form',
         action: '#',
       },
+      events: {
+        change: (e: Event) => {
+          e.preventDefault();
+
+          const input = this.element?.querySelector(
+            '[data-input="avatar"]',
+          ) as HTMLInputElement;
+
+          const files = input.files as FileList;
+
+          console.log(files[0]);
+          input.value = '';
+        },
+      },
     });
   }
   public override render(): TemplateDelegate {
