@@ -4,7 +4,7 @@ import { Link } from '@shared/ui/Link';
 import { Search } from '@shared/ui/Search';
 import { SendMessageForm } from '@features/sendMessage';
 import { ChatInfoBar } from '@widgets/ChatInfobar/';
-import ChatFeed from '@widgets/ChatFeed/ChatFeed';
+import { ChatFeed } from '@widgets/ChatFeed/';
 
 class ChatsPage extends Component {
   constructor() {
