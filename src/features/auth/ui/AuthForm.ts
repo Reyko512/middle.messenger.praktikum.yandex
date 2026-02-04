@@ -5,6 +5,7 @@ import { inputs, setValidationRules } from '../model/authForm';
 import { Button } from '@shared/ui/Button';
 import { Link } from '@shared/ui/Link';
 import { FormController } from '@shared/lib/form/formController';
+import { Routes } from '@shared/lib/router/routes';
 
 export default class AuthForm extends Component {
   formController: FormController | undefined;
@@ -32,7 +33,10 @@ export default class AuthForm extends Component {
           },
         },
       }),
-      Link: new Link({ text: 'Create account', href: '/sign-up' }),
+      Link: new Link({
+        text: 'Create account',
+        href: `/${Routes.SignUp}`,
+      }),
     });
 
     this.controller = controller;

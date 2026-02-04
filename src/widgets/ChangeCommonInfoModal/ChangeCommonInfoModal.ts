@@ -4,12 +4,13 @@ import type { TemplateDelegate } from 'handlebars';
 import { UpdateCommonInfoForm } from '@features/updateProfile';
 import { Link } from '@shared/ui/Link';
 import { Modal } from '@shared/ui/Modal';
+import { Routes } from '@shared/lib/router/routes';
 
 class ChangeCommonInfoModal extends Component {
   constructor() {
     super('section', {
       UpdateCommonInfoForm: new UpdateCommonInfoForm(),
-      Link: new Link({ text: '< back', href: '/user-data' }),
+      Link: new Link({ text: '< back', href: `/${Routes.UserData}` }),
       attrs: {
         class: 'change-common-info',
       },

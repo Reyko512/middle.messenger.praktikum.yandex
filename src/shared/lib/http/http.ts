@@ -12,66 +12,59 @@ type Options<T> = {
   headers?: Record<string, string>;
 };
 
-type OptionsWithoutMethod<T> = Omit<Options<T>, 'method'>;
-
 function queryStringify(data: Record<string, unknown>) {
   if (typeof data !== 'object' || !data) {
     throw new Error('Data must be object');
   }
 
   const keys = Object.keys(data);
+
+  const encodeDataValue = (value: unknown) => {
+    if (value === undefined || Object.is(value, null)) return value;
+
+    if (value === Object) return value;
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      return encodeURIComponent(value);
+    }
+
+    return value;
+  };
+
   return keys.reduce((result, key, index) => {
-    return `${result}${key}=${data[key]}${index < keys.length - 1 ? '&' : ''}`;
+    return `${result}${key}=${encodeDataValue(data[key])}${index < keys.length - 1 ? '&' : ''}`;
   }, '?');
 }
 
+type HTTPMethod<TData = unknown> = (
+  url: string,
+  options?: Omit<Options<TData>, 'method'>,
+) => Promise<XMLHttpRequest>;
+
 export default class HTTPTransport {
-  get = (url: string, options: OptionsWithoutMethod<undefined> = {}) => {
-    return this.request(
-      url,
-      { ...options, method: METHOD.GET },
-      options.timeout,
-    );
-  };
+  private createMethod<TData = unknown>(
+    method: METHOD,
+  ): HTTPMethod<TData> {
+    return (url, options = {}) =>
+      this.request(url, { ...options, method });
+  }
 
-  post = <TData>(
-    url: string,
-    options: OptionsWithoutMethod<TData> = {},
-  ) => {
-    return this.request<TData>(
-      url,
-      { ...options, method: METHOD.POST },
-      options.timeout,
-    );
-  };
+  get = this.createMethod(METHOD.GET);
 
-  put = <TData>(
-    url: string,
-    options: OptionsWithoutMethod<TData> = {},
-  ) => {
-    return this.request<TData>(
-      url,
-      { ...options, method: METHOD.PUT },
-      options.timeout,
-    );
-  };
+  post = this.createMethod(METHOD.POST);
 
-  delete = (
-    url: string,
-    options: OptionsWithoutMethod<undefined> = {},
-  ) => {
-    return this.request(
-      url,
-      { ...options, method: METHOD.DELETE },
-      options.timeout,
-    );
-  };
+  put = this.createMethod(METHOD.PUT);
 
-  request = <TData>(
+  delete = this.createMethod(METHOD.DELETE);
+
+  request = (
     url: string,
-    options: Options<TData> = {} as Options<TData>,
-    timeout = 5000,
-  ) => {
+    options: Options<unknown>,
+  ): Promise<XMLHttpRequest> => {
     const { headers = {}, method, data } = options;
 
     return new Promise(function (resolve, reject) {
@@ -85,7 +78,9 @@ export default class HTTPTransport {
 
       xhr.open(
         method,
-        isGet && !!data ? `${url}${queryStringify(data)}` : url,
+        isGet && !!data
+          ? `${url}${queryStringify(data as Record<string, unknown>)}`
+          : url,
       );
 
       Object.keys(headers).forEach((key) => {
@@ -99,7 +94,7 @@ export default class HTTPTransport {
       xhr.onabort = reject;
       xhr.onerror = reject;
 
-      xhr.timeout = timeout;
+      xhr.timeout = options.timeout ?? 0;
       xhr.ontimeout = reject;
 
       if (isGet || !data) {

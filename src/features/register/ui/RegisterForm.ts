@@ -8,6 +8,7 @@ import {
 import RegisterFormTemp from './RegisterForm.hbs';
 import type { TemplateDelegate } from 'handlebars';
 import { FormController } from '@shared/lib/form/formController';
+import { Routes } from '@shared/lib/router/routes';
 
 export default class RegisterForm extends Component {
   formController: FormController | undefined;
@@ -37,7 +38,7 @@ export default class RegisterForm extends Component {
       }),
       Link: new Link({
         text: 'Sign in',
-        href: '/sign-in',
+        href: `/${Routes.SignIn}`,
       }),
     });
 

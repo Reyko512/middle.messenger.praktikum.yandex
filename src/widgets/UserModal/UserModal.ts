@@ -7,6 +7,7 @@ import { Modal } from '@shared/ui/Modal';
 import { DataRow } from '@shared/ui/DataRow';
 import { Link } from '@shared/ui/Link';
 import { UpdateAvatarForm } from '@features/updateProfile';
+import { Routes } from '@shared/lib/router/routes';
 
 const userDataArray: { name: string; value: string }[] = [
   {
@@ -38,15 +39,15 @@ const userDataArray: { name: string; value: string }[] = [
 const linkArray: { text: string; href: string }[] = [
   {
     text: 'Change user data',
-    href: '/change-info',
+    href: `/${Routes.ChangeInfo}`,
   },
   {
     text: 'Change password',
-    href: '/change-password',
+    href: `/${Routes.ChangePassword}`,
   },
   {
     text: 'Logout',
-    href: '/sign-in',
+    href: `/${Routes.SignIn}`,
   },
 ];
 

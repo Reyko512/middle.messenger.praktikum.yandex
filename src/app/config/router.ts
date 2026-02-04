@@ -8,6 +8,7 @@ import { default as ChangePasswordModal } from '@widgets/ChangePasswordModal/Cha
 import { ChangeCommonInfoModal } from '@widgets/ChangeCommonInfoModal/';
 import type Component from '@shared/lib/components/Component';
 import { UserModal } from '@widgets/UserModal';
+import { Routes } from '@shared/lib/router/routes';
 
 enum COMPONENTS_NAMES {
   'Chats' = 'Chats',
@@ -36,37 +37,37 @@ export default function renderRoute(): Component<Record<string, unknown>> {
   const path = hash[hash.length - 1] ?? '';
 
   switch (path) {
-    case '':
+    case Routes.Messenger:
       return Templates.get(COMPONENTS_NAMES.Chats) as Component<
         Record<string, unknown>
       >;
 
-    case 'sign-in':
+    case Routes.SignIn:
       return Templates.get(COMPONENTS_NAMES.Auth) as Component<
         Record<string, unknown>
       >;
 
-    case 'sign-up':
+    case Routes.SignUp:
       return Templates.get(COMPONENTS_NAMES.Register) as Component<
         Record<string, unknown>
       >;
 
-    case '500':
+    case Routes._500:
       return Templates.get(COMPONENTS_NAMES._500) as Component<
         Record<string, unknown>
       >;
 
-    case 'user-data':
+    case Routes.UserData:
       return Templates.get(COMPONENTS_NAMES.UserModal) as Component<
         Record<string, unknown>
       >;
 
-    case 'change-password':
+    case Routes.ChangePassword:
       return Templates.get(
         COMPONENTS_NAMES.ChangePasswordModal,
       ) as Component<Record<string, unknown>>;
 
-    case 'change-info':
+    case Routes.ChangeInfo:
       return Templates.get(
         COMPONENTS_NAMES.ChangeCommonInfoModal,
       ) as Component<Record<string, unknown>>;

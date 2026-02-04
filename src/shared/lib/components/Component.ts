@@ -22,7 +22,7 @@ export default abstract class Component<
     UPDATED: 'updated',
     UNMOUNTED: 'unmounted',
     RENDER: 'render',
-  };
+  } as const;
 
   private _element: HTMLElement | null = null;
   private _meta: {

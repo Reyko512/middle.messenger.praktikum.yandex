@@ -1,5 +1,9 @@
 import type { FormValidator } from '@shared/lib/form/formValidator';
-import { login, required } from '@shared/lib/form/validationRules';
+import {
+  login,
+  password,
+  required,
+} from '@shared/lib/form/validationRules';
 
 type Input = {
   label: string;
@@ -32,5 +36,5 @@ export const inputs: Input[] = [
 export const setValidationRules = (value: FormValidator) => {
   value
     .addRule('login', required(), login)
-    .addRule('password', required());
+    .addRule('password', required(), password);
 };
