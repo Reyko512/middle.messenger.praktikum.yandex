@@ -24,7 +24,7 @@ export default class SendMessageForm extends Component {
         name: 'attach-file',
         id: 'attach-file',
         events: {
-          change: (e: Event) => {
+          change: (e: InputEvent) => {
             this.state['attach-file'] = undefined;
 
             const element = e.target as HTMLInputElement;
@@ -40,7 +40,7 @@ export default class SendMessageForm extends Component {
         value: stateDefault.message,
 
         events: {
-          input: (e: Event) => {
+          input: (e: InputEvent) => {
             const value = (e.target as HTMLInputElement).value;
             this.state.message = value;
           },
@@ -48,7 +48,7 @@ export default class SendMessageForm extends Component {
       }),
       ButtonSend: new ButtonSend({
         events: {
-          click: (e: Event) => {
+          click: (e: SubmitEvent) => {
             e.preventDefault();
             if (this.state['attach-file'] || this.state.message) {
               console.log(this.state);

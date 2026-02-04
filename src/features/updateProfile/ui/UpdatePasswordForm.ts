@@ -21,7 +21,7 @@ export default class UpdatePasswordForm extends Component {
         text: 'Save',
         type: 'submit',
         events: {
-          click: (e: Event) => {
+          click: (e: SubmitEvent) => {
             e.preventDefault();
             controller.submit((value) => {
               console.log({

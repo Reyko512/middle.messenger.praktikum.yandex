@@ -11,7 +11,7 @@ export default class UpdateAvatarForm extends Component {
         action: '#',
       },
       events: {
-        change: (e: Event) => {
+        change: (e: InputEvent) => {
           e.preventDefault();
 
           const input = this.element?.querySelector(

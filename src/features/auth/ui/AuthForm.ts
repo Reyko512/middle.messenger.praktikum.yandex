@@ -25,7 +25,7 @@ export default class AuthForm extends Component {
         text: 'Sign in',
         type: 'submit',
         events: {
-          click: (e: Event) => {
+          click: (e: SubmitEvent) => {
             e.preventDefault();
             this.controller.submit((values) => {
               console.log(values);

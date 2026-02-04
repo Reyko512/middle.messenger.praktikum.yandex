@@ -26,7 +26,7 @@ export default class UpdateCommonInfoForm extends Component {
         text: 'Save',
         type: 'submit',
         events: {
-          click: (e: Event) => {
+          click: (e: SubmitEvent) => {
             e.preventDefault();
             this.controller.submit((values) => {
               console.log(values);
