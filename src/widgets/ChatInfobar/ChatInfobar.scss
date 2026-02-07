@@ -1,14 +1,15 @@
 @use 'mixins' as *;
 
 .user-bar {
-  @include flex-vertical-center();
-  @include border-bottom();
+  @include flex-vertical-center;
+  @include border-bottom;
 
   padding: 4px 26px;
   justify-content: space-between;
 
   &__info {
-    @include flex-vertical-center();
+    @include flex-vertical-center;
+
     column-gap: 32px;
   }
 

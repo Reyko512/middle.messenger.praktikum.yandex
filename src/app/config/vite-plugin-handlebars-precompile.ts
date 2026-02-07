@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-base-to-string */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import Handlebars from 'handlebars';
-import { PluginOption } from 'vite';
+import type { PluginOption } from 'vite';
 
 export default function handlebars(): PluginOption {
   const fileRegexp = /\.hbs$|\.handlebars$/;

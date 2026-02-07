@@ -9,6 +9,7 @@
 
   &__field {
     @include size(100%, 100%);
+
     padding: 4px 40px 4px 16px;
 
     &::placeholder {
@@ -18,10 +19,11 @@
 
   &__icon {
     @include size(20px, 20px);
-    @include absolute-vertical-center();
+    @include absolute-vertical-center;
 
     right: 16px;
     cursor: pointer;
+
     path {
       transition: fill 0.3s ease-in-out;
     }

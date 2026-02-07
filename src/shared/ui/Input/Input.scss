@@ -6,7 +6,9 @@
   color: var(--floating-white);
   width: 100%;
 
-  @include flex-column();
+  $root: &;
+
+  @include flex-column;
 
   &__label {
     order: 2;
@@ -24,7 +26,7 @@
     border: none;
     background: none;
 
-    @include border-bottom();
+    @include border-bottom;
   }
 
   &__error {
@@ -36,7 +38,7 @@
 
   &:focus-within {
     .input__label {
-      transform: translate(12px, 0px);
+      transform: translate(12px, 0);
       font-size: 12px;
       color: var(--white);
     }
@@ -49,6 +51,11 @@
 
   &._error {
     color: var(--primary-error);
+
+    .input__error {
+      transition: all 0.1s;
+    }
+
     .input__label {
       color: var(--primary-error);
     }
@@ -56,6 +63,30 @@
     .input__field {
       color: var(--primary-error);
       border-color: var(--primary-error);
+    }
+
+    &:not(:focus-within, ._filled) {
+      .input__error {
+        transform: translateY(-14px);
+      }
+    }
+  }
+
+  &._filled {
+    #{$root}__label {
+      transform: translate(12px, 0);
+      font-size: 12px;
+    }
+
+    &:not(._error) {
+      #{$root}__field {
+        color: var(--white);
+        border-color: var(--white);
+      }
+
+      #{$root}__label {
+        color: var(--white);
+      }
     }
   }
 }

@@ -1,9 +1,11 @@
 .file-input {
   $root: &;
+
   width: min-content;
 
   &__icon {
     cursor: pointer;
+
     path {
       transition: stroke 0.2s ease-in-out;
     }

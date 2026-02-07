@@ -4,7 +4,7 @@
   margin: 0 auto;
   text-align: center;
 
-  @include absolute-center();
+  @include absolute-center;
 
   &__header {
     margin: 0;

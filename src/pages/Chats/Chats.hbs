@@ -1,19 +1,19 @@
 <div class="chats-page">
     <aside class="info">
         <header class="chat-utils">
-            {{>Link text="settings" href='/user-data'}}
-            {{>Search placeholder="Search"}}
+            {{{SettingsLink}}}
+            {{{Search}}}
         </header>
-        {{>ChatFeed }}
+        {{{ChatFeed}}}
     </aside>
     <main class="chat">
-        {{>ChatInfobar}}
+        {{{ChatInfoBar}}}
         <section class="chat-view">
             <p class="no-messages">
                 no messages yet...
             </p>
         </section>
-        {{>SendMessageForm }}
+        {{{ SendMessageForm }}}
     </main>
 </div>
 
