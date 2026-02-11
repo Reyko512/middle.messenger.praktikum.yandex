@@ -6,7 +6,7 @@ import { SendMessageForm } from '@features/sendMessage';
 import { ChatInfoBar } from '@widgets/ChatInfobar/';
 import { ChatFeed } from '@widgets/ChatFeed/';
 
-class ChatsPage extends Component {
+export default class ChatsPage extends Component {
   constructor() {
     super('div', {
       SettingsLink: new Link({ href: '/user-data', text: 'settings' }),
@@ -31,5 +31,3 @@ class ChatsPage extends Component {
     return Chats;
   }
 }
-
-export default new ChatsPage();

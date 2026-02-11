@@ -69,4 +69,4 @@ class UserModal extends Component {
   }
 }
 
-export default () => new Modal({ Content: new UserModal() });
+export default new Modal({ Content: new UserModal() });

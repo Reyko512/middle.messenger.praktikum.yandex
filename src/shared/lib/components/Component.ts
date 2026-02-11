@@ -357,4 +357,12 @@ export default abstract class Component<
   public getContent() {
     return this.element;
   }
+
+  public show() {
+    this.getContent()!.style.display = 'block';
+  }
+
+  public hide() {
+    this.getContent()!.style.display = 'none';
+  }
 }
