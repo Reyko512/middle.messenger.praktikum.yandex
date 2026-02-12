@@ -8,22 +8,25 @@ import './assets/styles/index.scss';
 
 import sharedUi from '@shared/ui';
 import registerComponents from '@shared/lib/components/registerComponents';
-import { Router } from './config/router_new';
+import { Router } from '@shared/lib/router/router';
 import { _404 } from '@pages/_404';
 import { _500 } from '@pages/_500';
 import { Auth } from '@pages/Auth';
 import { Chats } from '@pages/Chats';
 import { Register } from '@pages/Register';
 import { Routes } from '@shared/lib/router/routes';
+import UserModalPage from '@widgets/UserModal/UserModal';
+import { ChangeCommonInfoPage } from '@widgets/ChangeCommonInfoModal';
+import ChangePasswordPage from '@widgets/ChangePasswordModal/ChangePasswordModal';
 
 const router = new Router('#app');
 router
   .use(Routes.Messenger, Chats)
   .use(Routes.SignIn, Auth)
   .use(Routes.SignUp, Register)
-  // .use(Routes.UserData, UserModal)
-  // .use(Routes.ChangeInfo, ChangeCommonInfoModal)
-  // .use(Routes.ChangePassword, ChangePasswordModal)
+  .use(Routes.UserData, UserModalPage)
+  .use(Routes.ChangeInfo, ChangeCommonInfoPage)
+  .use(Routes.ChangePassword, ChangePasswordPage)
   .use(Routes._500, _500)
   .use('*', _404)
   .start();

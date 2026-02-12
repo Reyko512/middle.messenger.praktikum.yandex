@@ -35,7 +35,7 @@ export default class AuthForm extends Component {
       }),
       Link: new Link({
         text: 'Create account',
-        href: `/${Routes.SignUp}`,
+        href: `${Routes.SignUp}`,
       }),
     });
 

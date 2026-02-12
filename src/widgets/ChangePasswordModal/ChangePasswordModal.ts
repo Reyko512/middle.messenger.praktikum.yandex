@@ -10,7 +10,7 @@ class ChangePasswordModal extends Component {
   constructor() {
     super('section', {
       UpdatePasswordForm: new UpdatePasswordForm(),
-      Link: new Link({ text: '< back', href: `/${Routes.UserData}` }),
+      Link: new Link({ text: '< back', href: `${Routes.UserData}` }),
       attrs: {
         class: 'change-password',
       },
@@ -22,5 +22,8 @@ class ChangePasswordModal extends Component {
   }
 }
 
-export default (_props?: unknown) =>
-  new Modal({ Content: new ChangePasswordModal() });
+export default class ChangeCommonInfoPage extends Modal {
+  constructor() {
+    super({ Content: new ChangePasswordModal() });
+  }
+}

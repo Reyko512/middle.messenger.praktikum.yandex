@@ -1,1 +1,1 @@
-export { default as ChangeCommonInfoModal } from './ChangeCommonInfoModal';
+export { default as ChangeCommonInfoPage } from './ChangeCommonInfoModal';

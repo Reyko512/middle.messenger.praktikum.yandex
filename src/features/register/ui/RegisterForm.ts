@@ -38,7 +38,7 @@ export default class RegisterForm extends Component {
       }),
       Link: new Link({
         text: 'Sign in',
-        href: `/${Routes.SignIn}`,
+        href: `${Routes.SignIn}`,
       }),
     });
 

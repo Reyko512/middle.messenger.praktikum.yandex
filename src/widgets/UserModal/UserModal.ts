@@ -39,15 +39,15 @@ const userDataArray: { name: string; value: string }[] = [
 const linkArray: { text: string; href: string }[] = [
   {
     text: 'Change user data',
-    href: `/${Routes.ChangeInfo}`,
+    href: `${Routes.ChangeInfo}`,
   },
   {
     text: 'Change password',
-    href: `/${Routes.ChangePassword}`,
+    href: `${Routes.ChangePassword}`,
   },
   {
     text: 'Logout',
-    href: `/${Routes.SignIn}`,
+    href: `${Routes.SignIn}`,
   },
 ];
 
@@ -69,4 +69,8 @@ class UserModal extends Component {
   }
 }
 
-export default new Modal({ Content: new UserModal() });
+export default class UserModalPage extends Modal {
+  constructor() {
+    super({ Content: new UserModal() });
+  }
+}
