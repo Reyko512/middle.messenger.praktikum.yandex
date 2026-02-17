@@ -24,9 +24,18 @@ router
   .use(Routes.Messenger, Chats)
   .use(Routes.SignIn, Auth)
   .use(Routes.SignUp, Register)
-  .use(Routes.UserData, UserModalPage)
-  .use(Routes.ChangeInfo, ChangeCommonInfoPage)
-  .use(Routes.ChangePassword, ChangePasswordPage)
+  .use(Routes.UserData, UserModalPage, {
+    isModal: true,
+    rootQuery: '#modal-root',
+  })
+  .use(Routes.ChangeInfo, ChangeCommonInfoPage, {
+    isModal: true,
+    rootQuery: '#modal-root',
+  })
+  .use(Routes.ChangePassword, ChangePasswordPage, {
+    isModal: true,
+    rootQuery: '#modal-root',
+  })
   .use(Routes._500, _500)
   .use('*', _404)
   .start();

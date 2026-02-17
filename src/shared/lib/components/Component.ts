@@ -1,4 +1,4 @@
-import EventBus from './EventBus';
+import EventBus from '../EventBus/EventBus';
 import Handlebars, { type TemplateDelegate } from 'handlebars';
 import { v4 as makeUID } from 'uuid';
 
@@ -15,7 +15,6 @@ export default abstract class Component<
   TProps extends IProps = Record<string, unknown>,
 > {
   static EVENTS = {
-    BEFORE_INIT: 'before-init',
     INIT: 'init',
     BEFORE_MOUNT: 'before-mount',
     MOUNT: 'mount',
@@ -78,12 +77,10 @@ export default abstract class Component<
 
     this._registerEvents(eventBus);
 
-    eventBus.emit(Component.EVENTS.BEFORE_INIT);
     eventBus.emit(Component.EVENTS.INIT);
   }
 
   //system
-  _beforeInit() {}
 
   private _init() {
     this._createResources();
@@ -118,10 +115,38 @@ export default abstract class Component<
     this._render();
   }
 
-  // private _beforeUnmounted() {}
+  private _beforeUnmounted() {
+    this.beforeComponentUnmount();
+  }
+
+  protected _remove() {
+    this._removeEvents();
+
+    Object.values(this.children).forEach((child) => {
+      child.dispatchComponentDidUnmount();
+    });
+
+    Object.values(this._lists).forEach((list) => {
+      list.forEach((item) => {
+        if (item instanceof Component) {
+          item.dispatchComponentDidUnmount();
+        }
+      });
+    });
+
+    if (this._element) {
+      this._element.remove();
+    }
+  }
 
   private _unmounted() {
+    this._beforeUnmounted();
+
+    this._remove();
+
     this.componentDidUnmount();
+
+    this._element = null;
   }
 
   private _render() {
@@ -144,7 +169,6 @@ export default abstract class Component<
 
   private _registerEvents(eventBus: EventBus) {
     eventBus.on(Component.EVENTS.INIT, this._init.bind(this));
-    eventBus.on(Component.EVENTS.BEFORE_INIT, this._beforeInit.bind(this));
     eventBus.on(
       Component.EVENTS.BEFORE_MOUNT,
       this._beforeMounted.bind(this),
@@ -324,6 +348,10 @@ export default abstract class Component<
     this.eventBus().emit(Component.EVENTS.MOUNT, this.props);
   }
 
+  public dispatchComponentDidUnmount() {
+    this.eventBus().emit(Component.EVENTS.UNMOUNTED);
+  }
+
   public beforeComponentUnmount() {}
   public componentDidUnmount() {}
 
@@ -363,6 +391,12 @@ export default abstract class Component<
   }
 
   public hide() {
-    this.getContent()!.style.display = 'none';
+    if (this._element) {
+      this._element.style.display = 'none';
+    }
+  }
+
+  public destroy() {
+    this.dispatchComponentDidUnmount();
   }
 }

@@ -1,8 +1,10 @@
 @use 'mixins' as *;
 
 .modal-background {
-  position: relative;
+  position: fixed;
   width: 100vw;
+  top: 0;
+  left: 0;
   height: 100vh;
   overflow: hidden;
   backdrop-filter: blur(12px);
