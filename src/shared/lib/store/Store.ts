@@ -1,3 +1,4 @@
+import set from '../data/set';
 import EventBus from '../EventBus/EventBus';
 
 export enum StoreEvents {
