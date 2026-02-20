@@ -1,6 +1,7 @@
 import { Route } from './route';
 import type Component from '@shared/lib/components/Component';
 import { Routes } from './routes';
+import EventBus from '../EventBus/EventBus';
 
 export class Router {
   static __instance: Router;
@@ -9,6 +10,12 @@ export class Router {
   _currentRoute: Route | null = null;
   _currentModal: Route | null = null;
   _rootQuery: string = '#app';
+  public _eventBus: EventBus = new EventBus();
+
+  static EVENTS = {
+    START: 'routing: start',
+    END: 'routing: end',
+  } as const;
 
   constructor(rootQuery: string) {
     if (Router.__instance) {
@@ -45,13 +52,14 @@ export class Router {
     this._onRoute(window.location.pathname);
   }
 
-  private _isRouting = false;
+  // private _isRouting = false;
 
   async _onRoute(pathname: string) {
-    if (this._isRouting) return;
-    this._isRouting = true;
+    // if (this._isRouting) return;
+    // this._isRouting = true;
+    this._eventBus.emit(Router.EVENTS.START);
 
-    document.body.classList.add('router-animating');
+    // document.body.classList.add('router-animating');
 
     try {
       const route = this.getRoute(pathname);
@@ -72,7 +80,7 @@ export class Router {
         const guardResult = route.guard();
 
         if (typeof guardResult === 'string') {
-          this._isRouting = false;
+          // this._isRouting = false;
           this.go(guardResult);
           return;
         }
@@ -121,9 +129,10 @@ export class Router {
       this._currentRoute = route;
       await route.render();
     } finally {
-      this._isRouting = false;
+      // this._isRouting = false;
 
-      document.body.classList.remove('router-animating');
+      // document.body.classList.remove('router-animating');
+      this._eventBus.emit(Router.EVENTS.END);
     }
   }
 

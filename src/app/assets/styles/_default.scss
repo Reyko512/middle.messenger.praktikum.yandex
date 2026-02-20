@@ -23,4 +23,8 @@ textarea {
 
 .router-animating {
   overflow: hidden !important;
+  position: absolute;
+  #app {
+    overflow: hidden !important;
+  }
 }
