@@ -6,8 +6,6 @@ import.meta.glob('@features/**/*.scss', { eager: true });
 
 import './assets/styles/index.scss';
 
-import sharedUi from '@shared/ui';
-import registerComponents from '@shared/lib/components/registerComponents';
 import { Router } from '@shared/lib/router/router';
 import { _404 } from '@pages/_404';
 import { _500 } from '@pages/_500';
@@ -20,29 +18,28 @@ import { ChangeCommonInfoPage } from '@widgets/ChangeCommonInfoModal';
 import ChangePasswordPage from '@widgets/ChangePasswordModal/ChangePasswordModal';
 import attachAnimation from '@shared/lib/router/plugins/attachAnimation';
 
-registerComponents(sharedUi);
-document.addEventListener('DOMContentLoaded', () => {
-  const router = new Router('#app');
-  router
-    .use(Routes.Messenger, Chats)
-    .use(Routes.SignIn, Auth)
-    .use(Routes.SignUp, Register)
-    .use(Routes.UserData, UserModalPage, {
-      isModal: true,
-      rootQuery: '#modal-root',
-    })
-    .use(Routes.ChangeInfo, ChangeCommonInfoPage, {
-      isModal: true,
-      rootQuery: '#modal-root',
-    })
-    .use(Routes.ChangePassword, ChangePasswordPage, {
-      isModal: true,
-      rootQuery: '#modal-root',
-    })
-    .use(Routes._500, _500)
-    .use('*', _404)
-    .start();
+const router = new Router('#app');
 
+router
+  .use(Routes.Messenger, Chats)
+  .use(Routes.SignIn, Auth)
+  .use(Routes.SignUp, Register)
+  .use(Routes.UserData, UserModalPage, {
+    isModal: true,
+    rootQuery: '#modal-root',
+  })
+  .use(Routes.ChangeInfo, ChangeCommonInfoPage, {
+    isModal: true,
+    rootQuery: '#modal-root',
+  })
+  .use(Routes.ChangePassword, ChangePasswordPage, {
+    isModal: true,
+    rootQuery: '#modal-root',
+  })
+  .use(Routes._500, _500)
+  .use('*', _404);
+
+document.addEventListener('DOMContentLoaded', () => {
   attachAnimation(router);
   router.start();
 });

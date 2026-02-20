@@ -59,7 +59,7 @@ export class Route {
   match(pathname: string) {
     return pathname === this._pathname;
   }
-  private _playAnimation(
+  private async _playAnimation(
     element: HTMLElement,
     className: string,
   ): Promise<void> {

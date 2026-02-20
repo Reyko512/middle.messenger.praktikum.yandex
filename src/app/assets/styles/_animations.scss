@@ -1,8 +1,13 @@
-/* --- АНИМАЦИИ СТРАНИЦ (Слайдер) --- */
 .page-enter {
+  position: absolute;
+  width: 100%;
+
   animation: pageFadeIn 0.3s ease-in-out forwards;
 }
 .page-exit {
+  position: absolute;
+  width: 100%;
+
   animation: pageFadeOut 0.3s ease-in-out forwards;
 }
 

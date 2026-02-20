@@ -13,8 +13,8 @@ export class Router {
   public _eventBus: EventBus = new EventBus();
 
   static EVENTS = {
-    START: 'routing: start',
-    END: 'routing: end',
+    START: 'routing:start',
+    END: 'routing:end',
   } as const;
 
   constructor(rootQuery: string) {
@@ -52,14 +52,8 @@ export class Router {
     this._onRoute(window.location.pathname);
   }
 
-  // private _isRouting = false;
-
   async _onRoute(pathname: string) {
-    // if (this._isRouting) return;
-    // this._isRouting = true;
     this._eventBus.emit(Router.EVENTS.START);
-
-    // document.body.classList.add('router-animating');
 
     try {
       const route = this.getRoute(pathname);
@@ -80,7 +74,7 @@ export class Router {
         const guardResult = route.guard();
 
         if (typeof guardResult === 'string') {
-          // this._isRouting = false;
+          this._eventBus.emit(Router.EVENTS.END);
           this.go(guardResult);
           return;
         }
@@ -129,9 +123,6 @@ export class Router {
       this._currentRoute = route;
       await route.render();
     } finally {
-      // this._isRouting = false;
-
-      // document.body.classList.remove('router-animating');
       this._eventBus.emit(Router.EVENTS.END);
     }
   }
