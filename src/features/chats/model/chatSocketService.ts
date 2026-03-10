@@ -4,7 +4,6 @@ import { WS_CHATS_BASE } from '@shared/config/api';
 import { mergeSort } from '@shared/lib/algorithms/mergeSort';
 import { normalizeError } from '@shared/lib/network/normalizeError';
 import Queue from '@shared/lib/structures/Queue';
-import Stack from '@shared/lib/structures/Stack';
 import { appStore } from '@app/model';
 import type { SocketConnectionStatus } from '@app/model';
 
@@ -38,21 +37,7 @@ function isRenderableMessage(message: WSMessageData) {
 }
 
 function reverseMessages(messages: readonly WSMessageData[]) {
-  const stack = new Stack<WSMessageData>();
-  const reversed: WSMessageData[] = [];
-
-  for (const message of messages) {
-    stack.push(message);
-  }
-
-  while (!stack.isEmpty()) {
-    const message = stack.pop();
-    if (message) {
-      reversed.push(message);
-    }
-  }
-
-  return reversed;
+  return [...messages].reverse();
 }
 
 function makeMessageKey(message: WSMessageData) {
@@ -77,17 +62,7 @@ function mergeMessages(
     map.set(makeMessageKey(message), message);
   }
 
-  const result = mergeSort([...map.values()], messageComparator);
-  console.log(
-    'MESSAGES MERGED. Count before:',
-    existing.length,
-    'incoming:',
-    incoming.length,
-    'after:',
-    result.length,
-  );
-
-  return result;
+  return mergeSort([...map.values()], messageComparator);
 }
 
 class ChatSocketService {
@@ -133,7 +108,6 @@ class ChatSocketService {
       ...state.messagesByChatId,
       [chatId]: [...nextMessages],
     };
-    console.log('[Store Update] Chat:', chatId, 'Messages:', messages.length);
 
     if (chatId === state.selectedChatId) {
       appStore.setState({
@@ -153,12 +127,6 @@ class ChatSocketService {
     const state = appStore.getState();
     const currentMessages = [...(state.messagesByChatId[chatId] ?? [])];
     const newMergedMessages = mergeMessages(currentMessages, incoming);
-    console.log(
-      '[SocketService] Appending to chat:',
-      chatId,
-      'New total count:',
-      newMergedMessages.length,
-    );
     this.setMessages(chatId, [...newMergedMessages]);
   }
 
@@ -271,7 +239,6 @@ class ChatSocketService {
         }
 
         try {
-          console.log('SOCKET RAW DATA:', event.data);
           const payload = JSON.parse(event.data as string) as unknown;
           const activeChatId = this.activeChatId;
 

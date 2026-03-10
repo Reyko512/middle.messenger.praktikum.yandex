@@ -143,6 +143,28 @@ function areSenderNamesEqual(
   return leftKeys.every((key) => left[Number(key)] === right[Number(key)]);
 }
 
+interface MessageSyncSnapshot {
+  chatId: number | null;
+  currentUserId: number | null;
+  messages: readonly WSMessageData[];
+  senderNamesById: Record<number, string>;
+}
+
+function shouldSyncMessageList(
+  previous: MessageSyncSnapshot,
+  next: MessageSyncSnapshot,
+) {
+  return (
+    previous.chatId !== next.chatId ||
+    previous.currentUserId !== next.currentUserId ||
+    !areMessagesEqual(previous.messages, next.messages) ||
+    !areSenderNamesEqual(
+      previous.senderNamesById,
+      next.senderNamesById,
+    )
+  );
+}
+
 function canDeleteSelectedChat(state: AppState) {
   const selectedChat =
     state.chats.find((chat) => chat.id === state.selectedChatId) ?? null;
@@ -560,10 +582,6 @@ export default class ChatsPage extends Component<ChatsPageProps> {
       state.selectedChatUsers,
       state.user,
     );
-    console.log(
-      '[ChatsPage] Syncing state. Messages in selected chat:',
-      selectedMessages.length,
-    );
 
     this.syncChatSettingsState();
     const isChatSettingsOpen = this.props['isChatSettingsOpen'] as boolean;
@@ -576,11 +594,20 @@ export default class ChatsPage extends Component<ChatsPageProps> {
     );
 
     const currentUserId = state.user?.id ?? null;
-    const shouldSyncMessages =
-      this.lastSyncedChatId !== state.selectedChatId ||
-      this.lastSyncedCurrentUserId !== currentUserId ||
-      !areMessagesEqual(this.lastSyncedMessages, selectedMessages) ||
-      !areSenderNamesEqual(this.lastSyncedSenderNamesById, nextSenderNamesById);
+    const shouldSyncMessages = shouldSyncMessageList(
+      {
+        chatId: this.lastSyncedChatId,
+        currentUserId: this.lastSyncedCurrentUserId,
+        messages: this.lastSyncedMessages,
+        senderNamesById: this.lastSyncedSenderNamesById,
+      },
+      {
+        chatId: state.selectedChatId,
+        currentUserId,
+        messages: selectedMessages,
+        senderNamesById: nextSenderNamesById,
+      },
+    );
 
     if (shouldSyncMessages) {
       messageList.setMessages(

@@ -47,6 +47,8 @@ interface InnerChatMessagesProps
   messageCount: number;
 }
 
+const SCROLL_THRESHOLD = 24;
+
 function formatMessageTime(iso: string) {
   const date = new Date(iso);
   return date.toLocaleTimeString([], {
@@ -194,6 +196,7 @@ function buildRenderableItems(
 export default class ChatMessages extends Component<InnerChatMessagesProps> {
   private observer: IntersectionObserver | null = null;
   private isFetching = false;
+  private restoreScrollFrameId: number | null = null;
   private pendingScrollRestore:
     | {
         scrollOffset: number;
@@ -261,7 +264,7 @@ export default class ChatMessages extends Component<InnerChatMessagesProps> {
       return;
     }
 
-    if (list.scrollTop > 24) {
+    if (list.scrollTop > SCROLL_THRESHOLD) {
       return;
     }
 
@@ -301,7 +304,12 @@ export default class ChatMessages extends Component<InnerChatMessagesProps> {
       this.pendingScrollRestore = null;
     }
 
-    queueMicrotask(() => {
+    if (this.restoreScrollFrameId !== null) {
+      window.cancelAnimationFrame(this.restoreScrollFrameId);
+    }
+
+    this.restoreScrollFrameId = window.requestAnimationFrame(() => {
+      this.restoreScrollFrameId = null;
       const list = this.element;
       if (!list) {
         return;
@@ -320,6 +328,11 @@ export default class ChatMessages extends Component<InnerChatMessagesProps> {
   }
 
   public override beforeComponentUnmount() {
+    if (this.restoreScrollFrameId !== null) {
+      window.cancelAnimationFrame(this.restoreScrollFrameId);
+      this.restoreScrollFrameId = null;
+    }
+
     this.observer?.disconnect();
     this.observer = null;
   }

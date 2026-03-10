@@ -30,6 +30,17 @@ function sortMessages(messages: readonly WSMessageData[]) {
   });
 }
 
+function getPersistedChatId() {
+  const persistedValue = sessionStorage.getItem(SELECTED_CHAT_STORAGE_KEY);
+
+  if (persistedValue === null) {
+    return null;
+  }
+
+  const chatId = Number(persistedValue);
+  return Number.isNaN(chatId) ? null : chatId;
+}
+
 class ChatsService {
   private isChatInList(chatId: number, chats: readonly Chat[]) {
     return chats.some((chat) => chat.id === chatId);
@@ -70,12 +81,10 @@ class ChatsService {
         return sortedChats;
       }
 
-      const persistedChatId = Number(
-        sessionStorage.getItem(SELECTED_CHAT_STORAGE_KEY),
-      );
+      const persistedChatId = getPersistedChatId();
 
       if (
-        Number.isNaN(persistedChatId) ||
+        persistedChatId === null ||
         !this.isChatInList(persistedChatId, sortedChats)
       ) {
         return sortedChats;
