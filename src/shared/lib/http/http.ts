@@ -24,6 +24,7 @@ type RequestOptions<TData extends RequestData = undefined> = {
   data?: TData;
   timeout?: number;
   headers?: Record<string, string>;
+  responseType?: XMLHttpRequestResponseType;
 };
 
 type MethodOptions<TData extends RequestData> = Omit<
@@ -162,7 +163,14 @@ function buildRequestBody(data: RequestData) {
   return JSON.stringify(data);
 }
 
-function parseResponseBody<TResponse>(xhr: XMLHttpRequest): TResponse {
+function parseResponseBody<TResponse>(
+  xhr: XMLHttpRequest,
+  responseType: XMLHttpRequestResponseType,
+): TResponse {
+  if (responseType && responseType !== 'text') {
+    return xhr.response as TResponse;
+  }
+
   const responseText = xhr.responseText;
 
   if (!responseText) {
@@ -244,6 +252,7 @@ export default class HTTPTransport {
       data,
       headers = {},
       timeout = DEFAULT_TIMEOUT,
+      responseType = '',
     } = options;
 
     return new Promise<TResponse>((resolve, reject) => {
@@ -254,13 +263,17 @@ export default class HTTPTransport {
       xhr.open(method, requestUrl);
       xhr.timeout = timeout;
       xhr.withCredentials = true;
+      xhr.responseType = responseType;
 
       Object.entries(requestHeaders).forEach(([headerName, headerValue]) => {
         xhr.setRequestHeader(headerName, headerValue);
       });
 
       xhr.onload = () => {
-        const payload = parseResponseBody<TResponse | HTTPErrorReason>(xhr);
+        const payload = parseResponseBody<TResponse | HTTPErrorReason>(
+          xhr,
+          responseType,
+        );
 
         if (xhr.status >= 200 && xhr.status < 300) {
           resolve(payload as TResponse);

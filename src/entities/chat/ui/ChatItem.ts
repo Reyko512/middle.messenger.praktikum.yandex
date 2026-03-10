@@ -39,7 +39,19 @@ export default class ChatItem extends Component<ChatItemProps> {
       this.element?.classList.toggle('chat-item_active', newProps.isActive);
     }
 
-    return true;
+    if (oldProps.avatarUrl !== newProps.avatarUrl) {
+      const avatar = this.children['Avatar'] as Avatar | undefined;
+      avatar?.setProps({
+        avatarUrl: newProps.avatarUrl,
+      });
+    }
+
+    return (
+      oldProps.name !== newProps.name ||
+      oldProps.time !== newProps.time ||
+      oldProps.lastMessage !== newProps.lastMessage ||
+      oldProps.counter !== newProps.counter
+    );
   }
 
   public override render(): TemplateDelegate {

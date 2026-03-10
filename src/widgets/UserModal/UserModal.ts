@@ -1,4 +1,3 @@
-import _template from '@shared/lib/components/_templator';
 import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import UserModalTmp from './UserModal.hbs';
 

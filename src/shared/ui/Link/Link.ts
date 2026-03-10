@@ -1,4 +1,4 @@
-import _template from '@shared/lib/components/_templator';
+import templator from '@shared/lib/components/Templator';
 import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import { Router } from '@shared/lib/router/router';
 interface ILinkProps extends ComponentProps {
@@ -28,7 +28,7 @@ class Link extends Component<ILinkProps> {
 
   render() {
     const { text } = this.props;
-    return _template(text);
+    return templator(text);
   }
 }
 

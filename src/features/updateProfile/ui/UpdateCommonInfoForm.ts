@@ -6,7 +6,7 @@ import {
   setValidationRules,
   type UpdateCommonInfoFormValues,
 } from '../model/updateCommonInfoForm';
-import _template from '@shared/lib/components/_templator';
+import templator from '@shared/lib/components/Templator';
 import { FormController } from '@shared/lib/form/formController';
 import { profileService } from '@features/updateProfile/model/profileService';
 import { sanitizeText } from '@shared/lib/security/sanitize';
@@ -110,7 +110,7 @@ export default class UpdateCommonInfoForm extends Component<UpdateCommonInfoForm
   }
 
   public override render(): TemplateDelegate {
-    return _template(
+    return templator(
       '{{{inputs}}}{{{Button}}}<p class="update-info-form__error">{{error}}</p>',
     );
   }

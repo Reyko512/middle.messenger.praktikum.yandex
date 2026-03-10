@@ -24,13 +24,19 @@ function createFormValues<TFields extends readonly FormFieldConfig<string>[]>(
   ) as FormValues<TFields>;
 }
 
-function getFieldValue(event: Event) {
-  const target = event.target;
-
-  if (
+function isTextFieldTarget(
+  target: EventTarget | null,
+): target is HTMLInputElement | HTMLTextAreaElement {
+  return (
     target instanceof HTMLInputElement ||
     target instanceof HTMLTextAreaElement
-  ) {
+  );
+}
+
+function getFieldValue(event: Event) {
+  const target = event.target as EventTarget | null;
+
+  if (isTextFieldTarget(target)) {
     return target.value;
   }
 

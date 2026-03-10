@@ -1,5 +1,5 @@
 import { UpdatePasswordForm } from '@features/updateProfile';
-import _template from '@shared/lib/components/_templator';
+import templator from '@shared/lib/components/Templator';
 import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import { Routes } from '@shared/lib/router/routes';
 import { Link } from '@shared/ui/Link';
@@ -23,7 +23,7 @@ class ChangePasswordModal extends Component<ChangePasswordModalProps> {
   }
 
   public override render(): TemplateDelegate {
-    return _template('{{{UpdatePasswordForm}}} {{{Link}}}');
+    return templator('{{{UpdatePasswordForm}}} {{{Link}}}');
   }
 }
 

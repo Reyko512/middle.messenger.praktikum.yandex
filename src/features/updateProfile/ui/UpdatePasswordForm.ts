@@ -1,4 +1,4 @@
-import _template from '@shared/lib/components/_templator';
+import templator from '@shared/lib/components/Templator';
 import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import type { TemplateDelegate } from 'handlebars';
 import {
@@ -87,7 +87,7 @@ export default class UpdatePasswordForm extends Component<UpdatePasswordFormProp
   }
 
   public override render(): TemplateDelegate {
-    return _template(
+    return templator(
       '{{{inputs}}}{{{Button}}}<p class="update-password-form__error">{{error}}</p>',
     );
   }

@@ -1,5 +1,5 @@
 import Component, { type ComponentProps } from '@shared/lib/components/Component';
-import _template from '@shared/lib/components/_templator';
+import templator from '@shared/lib/components/Templator';
 import ChatMessagesTemplate from './ChatMessages.hbs';
 import type { TemplateDelegate } from 'handlebars';
 import { MessageItem } from '@entities/message';
@@ -35,7 +35,7 @@ class DateDividerItem extends Component<DateDividerItemProps> {
   }
 
   public override render(): TemplateDelegate {
-    return _template('<span>{{label}}</span>');
+    return templator('<span>{{label}}</span>');
   }
 }
 
@@ -49,9 +49,11 @@ interface InnerChatMessagesProps
 
 const SCROLL_THRESHOLD = 24;
 
+const MESSAGES_LOCALE = 'ru-RU';
+
 function formatMessageTime(iso: string) {
   const date = new Date(iso);
-  return date.toLocaleTimeString([], {
+  return date.toLocaleTimeString(MESSAGES_LOCALE, {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -99,14 +101,14 @@ function formatDateDividerLabel(value: string) {
   yesterday.setDate(today.getDate() - 1);
 
   if (isSameDate(date, today)) {
-    return 'Today';
+    return '\u0421\u0435\u0433\u043e\u0434\u043d\u044f';
   }
 
   if (isSameDate(date, yesterday)) {
-    return 'Yesterday';
+    return '\u0412\u0447\u0435\u0440\u0430';
   }
 
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(MESSAGES_LOCALE, {
     month: 'long',
     day: 'numeric',
   });

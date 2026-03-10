@@ -1,4 +1,5 @@
 import Component, { type ComponentProps } from '@shared/lib/components/Component';
+import { HTTPTransport } from '@shared/lib/http';
 import MessageItemTemplate from './message-item.hbs';
 import type { TemplateDelegate } from 'handlebars';
 
@@ -13,6 +14,8 @@ interface MessageItemProps extends ComponentProps {
   time: string;
   isOwn: boolean;
 }
+
+const http = new HTTPTransport();
 
 export default class MessageItem extends Component<MessageItemProps> {
   constructor(props: MessageItemProps) {
@@ -58,15 +61,9 @@ export default class MessageItem extends Component<MessageItemProps> {
     }
 
     try {
-      const response = await fetch(fileUrl, {
-        credentials: 'include',
+      const blob = await http.get<Blob>(fileUrl, {
+        responseType: 'blob',
       });
-
-      if (!response.ok) {
-        throw new Error(`Failed to download file: ${response.status}`);
-      }
-
-      const blob = await response.blob();
       const objectUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = objectUrl;

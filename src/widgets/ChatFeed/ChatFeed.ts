@@ -1,6 +1,6 @@
 import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import type { TemplateDelegate } from 'handlebars';
-import _template from '@shared/lib/components/_templator';
+import templator from '@shared/lib/components/Templator';
 import { ChatItem } from '@entities/chat';
 interface ChatPreview {
   id: number;
@@ -57,6 +57,6 @@ export default class ChatFeed extends Component<InnerChatFeedProps> {
   }
 
   public override render(): TemplateDelegate {
-    return _template('{{{chats}}}');
+    return templator('{{{chats}}}');
   }
 }

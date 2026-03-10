@@ -22,6 +22,7 @@ export interface RegisterFormProps extends ComponentProps {
 
 export default class RegisterForm extends Component<RegisterFormProps> {
   private readonly controller: FormController<typeof registerFormInputs>;
+  private isSubmitting = false;
 
   constructor(props: Pick<RegisterFormProps, 'error' | 'onSubmit'>) {
     const controller = new FormController(registerFormInputs);
@@ -35,7 +36,7 @@ export default class RegisterForm extends Component<RegisterFormProps> {
       events: {
         submit: (event: Event) => {
           event.preventDefault();
-          this.submit();
+          void this.submit();
         },
       },
       inputs: controller.inputs,
@@ -44,6 +45,7 @@ export default class RegisterForm extends Component<RegisterFormProps> {
       Button: new Button({
         text: 'Sign up',
         type: 'submit',
+        disabled: false,
       }),
       Link: new Link({
         text: 'Sign in',
@@ -54,10 +56,33 @@ export default class RegisterForm extends Component<RegisterFormProps> {
     this.controller = controller;
   }
 
-  private submit() {
-    this.controller.submit((values) => {
-      void this.props.onSubmit(values);
+  private setSubmitting(isSubmitting: boolean) {
+    this.isSubmitting = isSubmitting;
+    const button = this.children['Button'] as Button | undefined;
+
+    button?.setProps({
+      text: isSubmitting ? 'Signing up...' : 'Sign up',
+      disabled: isSubmitting,
     });
+  }
+
+  private async submit() {
+    if (this.isSubmitting) {
+      return;
+    }
+
+    const validationResult = this.controller.validate();
+    if (!validationResult.isValid) {
+      return;
+    }
+
+    this.setSubmitting(true);
+
+    try {
+      await this.props.onSubmit(this.controller.getValues());
+    } finally {
+      this.setSubmitting(false);
+    }
   }
 
   public override render(): TemplateDelegate {

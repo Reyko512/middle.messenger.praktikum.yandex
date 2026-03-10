@@ -52,6 +52,10 @@ export default abstract class Component<TProps extends ComponentProps = Componen
   };
   private lists: ComponentLists = {};
   private activeEvents: Record<string, ComponentEventHandler> = {};
+  private boundEventHandlers = new WeakMap<
+    ComponentEventHandler,
+    ComponentEventHandler
+  >();
   private readonly eventBusRef: () => EventBus;
 
   constructor(
@@ -355,7 +359,13 @@ export default abstract class Component<TProps extends ComponentProps = Componen
 
     Object.entries(this.props.events ?? {}).forEach(([event, handler]) => {
       if (handler) {
-        const boundHandler = handler.bind(this) as ComponentEventHandler;
+        let boundHandler = this.boundEventHandlers.get(handler);
+
+        if (!boundHandler) {
+          boundHandler = handler.bind(this) as ComponentEventHandler;
+          this.boundEventHandlers.set(handler, boundHandler);
+        }
+
         this.activeEvents[event] = boundHandler;
         this.elementNode?.addEventListener(event, boundHandler);
       }

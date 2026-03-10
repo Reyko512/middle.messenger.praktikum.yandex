@@ -7,7 +7,7 @@ interface ErrorPageProps extends ComponentProps {
   Link: Link;
 }
 
-export default class Page_500 extends Component<ErrorPageProps> {
+export default class Page500 extends Component<ErrorPageProps> {
   constructor() {
     super('div', {
       attrs: {

@@ -36,8 +36,8 @@ function isRenderableMessage(message: WSMessageData) {
   return message.type === 'message' || message.type === 'file';
 }
 
-function reverseMessages(messages: readonly WSMessageData[]) {
-  return [...messages].reverse();
+function sortMessagesByTime(messages: readonly WSMessageData[]) {
+  return mergeSort([...messages], messageComparator);
 }
 
 function makeMessageKey(message: WSMessageData) {
@@ -243,7 +243,7 @@ class ChatSocketService {
           const activeChatId = this.activeChatId;
 
           if (Array.isArray(payload)) {
-            const history = reverseMessages(
+            const history = sortMessagesByTime(
               payload.filter(isWSMessageData).filter(isRenderableMessage),
             );
             if (
