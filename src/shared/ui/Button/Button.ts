@@ -1,8 +1,8 @@
 import _template from '@shared/lib/components/_templator';
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import type { TemplateDelegate } from 'handlebars';
 
-interface ButtonProps extends Record<string, unknown> {
+export interface ButtonProps extends ComponentProps {
   type: 'submit' | 'button';
   text: string;
 }

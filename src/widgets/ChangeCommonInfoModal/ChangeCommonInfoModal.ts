@@ -1,4 +1,4 @@
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import ChangeCommonInfoModalTemp from './ChangeCommonInfoModal.hbs';
 import type { TemplateDelegate } from 'handlebars';
 import { UpdateCommonInfoForm } from '@features/updateProfile';
@@ -6,7 +6,12 @@ import { Link } from '@shared/ui/Link';
 import { Modal } from '@shared/ui/Modal';
 import { Routes } from '@shared/lib/router/routes';
 
-class ChangeCommonInfoModal extends Component {
+interface ChangeCommonInfoModalProps extends ComponentProps {
+  UpdateCommonInfoForm: UpdateCommonInfoForm;
+  Link: Link;
+}
+
+class ChangeCommonInfoModal extends Component<ChangeCommonInfoModalProps> {
   constructor() {
     super('section', {
       UpdateCommonInfoForm: new UpdateCommonInfoForm(),

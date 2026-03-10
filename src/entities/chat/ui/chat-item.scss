@@ -62,4 +62,17 @@
       color: var(--dark-primary);
     }
   }
+
+  &_active {
+    background: var(--filter-white);
+    color: var(--dark-primary);
+
+    #{$root}__time {
+      color: var(--teal);
+    }
+
+    #{$root}__last-message {
+      color: var(--dark-primary);
+    }
+  }
 }

@@ -1,8 +1,8 @@
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import type { TemplateDelegate } from 'handlebars';
 import AvatarTemp from './Avatar.hbs';
 
-interface AvatarProps extends Record<string, unknown> {
+interface AvatarProps extends ComponentProps {
   avatarUrl?: string | null;
 }
 

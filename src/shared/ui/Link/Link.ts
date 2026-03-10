@@ -1,7 +1,7 @@
 import _template from '@shared/lib/components/_templator';
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import { Router } from '@shared/lib/router/router';
-interface ILinkProps extends Record<string, unknown> {
+interface ILinkProps extends ComponentProps {
   href: string;
   text: string;
   className?: string;

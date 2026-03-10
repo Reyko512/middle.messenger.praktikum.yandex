@@ -3,6 +3,12 @@
 <div class="chat-item__info">
     <p class="chat-item__time">{{time}}</p>
     <p class="chat-item__name">{{name}}</p>
-    <p class="chat-item__last-message">{{lastMessage}}</p>
-    <div class="chat-item__counter"><p>{{counter}}</p></div>
+    {{#if lastMessage}}
+      <p class="chat-item__last-message">{{lastMessage}}</p>
+    {{else}}
+      <p class="chat-item__last-message">no messages yet</p>
+    {{/if}}
+    {{#if counter}}
+      <div class="chat-item__counter"><p>{{counter}}</p></div>
+    {{/if}}
 </div>

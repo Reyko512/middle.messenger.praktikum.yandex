@@ -1,10 +1,31 @@
 .registration-page {
-  padding: 16px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  background:
+    radial-gradient(circle at 50% 16%, rgb(3 218 197 / 5%), transparent 28%),
+    rgb(10 10 10);
+
+  main {
+    width: min(460px, 100%);
+  }
 
   &__header {
-    font-size: 56px;
+    --page-title-width: 426px;
+    --page-title-font-size: 56px;
+
     margin: 0 auto;
-    text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 32px;
+  }
+}
+
+@media (width <= 520px) {
+  .registration-page {
+    &__header {
+      --page-title-width: 100%;
+      --page-title-font-size: 44px;
+    }
   }
 }

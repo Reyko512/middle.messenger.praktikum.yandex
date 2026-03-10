@@ -1,0 +1,40 @@
+$page-title-binary-pattern: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='84' viewBox='0 0 360 84'%3E%3Cstyle%3Etext%7Bfill:%23f8f8f8;fill-opacity:.82;font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:.03em%7D%3C/style%3E%3Ctext x='0' y='14'%3E1010101010010101001010101010101010101010101010101010100101010101001%3C/text%3E%3Ctext x='0' y='26'%3E1001010101010101010101001010101010101001010101010101010101011010100%3C/text%3E%3Ctext x='0' y='38'%3E1010101010100101010101010101010010110101010100101010101010101001010%3C/text%3E%3Ctext x='0' y='50'%3E1010100101010101011010101010011001010101010101010100101010101010101%3C/text%3E%3Ctext x='0' y='62'%3E1010010101010010101010100101010101010100101010010101001010101010101%3C/text%3E%3Ctext x='0' y='74'%3E0101101001001010101010101011001011010101010101010101010101010010101%3C/text%3E%3C/svg%3E";
+
+.page-title {
+  display: block;
+  max-width: 100%;
+  margin-inline: auto;
+  font-family: Rubik, sans-serif;
+  font-size: var(--page-title-font-size, 56px);
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+  background-image: url($page-title-binary-pattern);
+  background-position: center;
+  background-repeat: repeat;
+  background-size: clamp(220px, 50vw, 360px) 84px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 2px rgb(255 255 255 / 55%));
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .page-title {
+    background-image: none;
+    color: var(--white);
+  }
+}
+
+.page-code {
+  color: var(--white);
+  line-height: 0.86;
+  letter-spacing: 0.02em;
+  text-align: center;
+  font-weight: 900;
+  text-shadow: 0 0 22px rgb(255 255 255 / 18%);
+}

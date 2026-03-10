@@ -1,95 +1,120 @@
-import type Component from '@shared/lib/components/Component';
+import Component from '@shared/lib/components/Component';
+import type { ComponentProps } from '@shared/lib/components/Component';
 import { render } from '@shared/lib/components/renderDom';
 
+interface RouteProps {
+  rootQuery?: string;
+  guard?: () => boolean | string;
+}
+
+type RouteViewProps = ComponentProps & RouteProps;
+
 export class Route {
-  public readonly isModal: boolean;
   public readonly guard?: () => boolean | string;
-  _pathname: string;
-  _blockClass: new (props: unknown) => Component;
-  _block: Component | null;
-  _props: {
-    rootQuery?: string;
-    [key: string]: unknown;
-  };
+  private pathnameValue: string;
+  private readonly blockClass: new (props: RouteViewProps) => Component<ComponentProps>;
+  private block: Component<ComponentProps> | null = null;
+  private readonly props: RouteViewProps;
+  private animationController: AbortController | null = null;
 
   constructor(
     pathname: string,
-    view: new (props: unknown) => Component,
-    props: {
-      rootQuery?: string;
-      isModal?: boolean;
-      guard?: () => boolean | string;
-      [key: string]: unknown;
-    },
+    view: new (props: RouteViewProps) => Component<ComponentProps>,
+    props: RouteViewProps,
   ) {
-    this._pathname = pathname;
-    this._blockClass = view;
-    this._block = null;
-    this._props = props;
-
-    this.isModal = props.isModal ?? false;
+    this.pathnameValue = pathname;
+    this.blockClass = view;
+    this.props = props;
     this.guard = props.guard ?? (() => true);
   }
 
   get pathname() {
-    return this._pathname;
+    return this.pathnameValue;
   }
 
-  navigate(pathname: string) {
-    if (this.match(pathname)) {
-      this._pathname = pathname;
-      this.render();
-    }
+  public match(pathname: string) {
+    return pathname === this.pathnameValue;
   }
 
-  async leave() {
-    if (this._block) {
-      const element = this._block.getContent();
-
-      if (element) {
-        const animClass = this.isModal ? 'modal-exit' : 'page-exit';
-        await this._playAnimation(element, animClass);
-      }
-
-      this._block.dispatchComponentDidUnmount();
-      this._block = null;
-    }
+  private abortActiveAnimation() {
+    this.animationController?.abort();
+    this.animationController = null;
   }
 
-  match(pathname: string) {
-    return pathname === this._pathname;
-  }
-  private async _playAnimation(
+  private async playAnimation(
     element: HTMLElement,
     className: string,
   ): Promise<void> {
-    return new Promise((resolve) => {
-      element.classList.add(className);
+    this.abortActiveAnimation();
 
+    const controller = new AbortController();
+    const { signal } = controller;
+    this.animationController = controller;
+
+    return new Promise((resolve) => {
+      let isSettled = false;
+
+      const finish = () => {
+        if (isSettled) {
+          return;
+        }
+
+        isSettled = true;
+        element.classList.remove(className);
+        signal.removeEventListener('abort', finish);
+
+        if (this.animationController === controller) {
+          this.animationController = null;
+        }
+
+        resolve();
+      };
+
+      signal.addEventListener('abort', finish, { once: true });
+      element.classList.add(className);
       element.addEventListener(
         'animationend',
-        () => {
-          element.classList.remove(className);
-          resolve();
-        },
-        { once: true },
+        finish,
+        { once: true, signal },
       );
     });
   }
 
-  async render() {
-    if (!this._block) {
-      this._block = new this._blockClass(this._props);
-      render(this._props.rootQuery ?? '#app', this._block);
+  public async leave() {
+    if (!this.block) {
+      this.abortActiveAnimation();
+      return;
+    }
 
-      const element = this._block.getContent();
+    const element = this.block.getContent();
+    if (element) {
+      await this.playAnimation(element, 'page-exit');
+    }
+
+    this.block.dispatchComponentDidUnmount();
+    this.block = null;
+    this.abortActiveAnimation();
+  }
+
+  public async render() {
+    if (!this.block) {
+      this.block = new this.blockClass(this.props);
+
+      await Promise.resolve();
+
+      const element = this.block.getContent();
+      if (!element) {
+        throw new Error('Route render failed: component has no root element');
+      }
+
+      render(this.props.rootQuery ?? '#app', this.block);
+
       if (element) {
-        const animClass = this.isModal ? 'modal-enter' : 'page-enter';
-        await this._playAnimation(element, animClass);
+        await this.playAnimation(element, 'page-enter');
       }
       return;
     }
 
-    this._block.show();
+    this.block.show();
   }
 }

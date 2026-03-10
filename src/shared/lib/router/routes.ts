@@ -1,9 +1,9 @@
 export enum Routes {
-  Messenger = '/messenger',
   SignIn = '/',
   SignUp = '/sign-up',
-  _500 = '/500',
+  Messenger = '/messenger',
   UserData = '/settings',
-  ChangePassword = '/change-password',
   ChangeInfo = '/change-info',
+  ChangePassword = '/change-password',
+  _500 = '/500',
 }

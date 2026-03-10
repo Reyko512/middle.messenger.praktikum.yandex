@@ -1,19 +1,37 @@
 import EventBus from '../EventBus/EventBus';
-import Handlebars, { type TemplateDelegate } from 'handlebars';
+import { type TemplateDelegate } from 'handlebars';
 import { v4 as makeUID } from 'uuid';
 
-type EventsMap = Record<string, EventListener>;
-interface IProps extends Record<string, unknown> {
+type BivariantEventHandler<TEvent extends Event> = {
+  bivarianceHack(event: TEvent): void;
+}['bivarianceHack'];
+
+export type ComponentEventHandler = BivariantEventHandler<Event>;
+export type ComponentEvents = Partial<Record<string, ComponentEventHandler>>;
+
+export interface ComponentProps {
   className?: string;
   attrs?: Record<string, string>;
-  events?: EventsMap;
+  events?: ComponentEvents;
+  _id?: string | null;
 }
-type Mutable<T> = {
+
+type Mutable<T extends object> = {
   -readonly [K in keyof T]: T[K];
 };
-export default abstract class Component<
-  TProps extends IProps = Record<string, unknown>,
-> {
+
+type ChildComponent = Component<ComponentProps>;
+type ListItem = ChildComponent | string | number | boolean;
+type ComponentChildren = Record<string, ChildComponent>;
+type ComponentLists = Record<string, ListItem[]>;
+type TemplateValue = string | number | boolean | null | undefined;
+
+interface ComponentMeta<TProps extends ComponentProps> {
+  tagName: keyof HTMLElementTagNameMap;
+  props: TProps;
+}
+
+export default abstract class Component<TProps extends ComponentProps = ComponentProps> {
   static EVENTS = {
     INIT: 'init',
     BEFORE_MOUNT: 'before-mount',
@@ -23,110 +41,93 @@ export default abstract class Component<
     RENDER: 'render',
   } as const;
 
-  private _element: HTMLElement | null = null;
-  private _meta: {
-    tagName: string;
-    props: TProps;
-  } | null = null;
-  props: TProps = {} as TProps;
-  children: Record<string, Component> = {};
-  __id: string | null;
-  private _setUpdate: boolean = false;
-  settings: {
+  private elementNode: HTMLElement | null = null;
+  private meta: ComponentMeta<TProps> | null = null;
+  public props: TProps;
+  public children: ComponentChildren = {};
+  public readonly __id: string | null;
+  private shouldUpdate = false;
+  protected settings: {
     withInternalId: boolean;
   };
-  private _lists: Record<string, Component[]>;
-
-  private eventBus: () => EventBus;
+  private lists: ComponentLists = {};
+  private activeEvents: Record<string, ComponentEventHandler> = {};
+  private readonly eventBusRef: () => EventBus;
 
   constructor(
-    tagName = 'div',
-    propsAndChildren = {} as TProps,
-    settings = {
+    tagName: keyof HTMLElementTagNameMap = 'div',
+    propsAndChildren: TProps,
+    settings: { withInternalId: boolean } = {
       withInternalId: true,
-    } as typeof this.settings,
+    },
   ) {
     const eventBus = new EventBus();
+    const { children, props, lists } = this.splitProps(propsAndChildren);
 
-    const { children, props, lists } = this._getChildren(propsAndChildren);
-
-    this._meta = {
+    this.meta = {
       tagName,
       props,
     };
 
     this.settings = settings;
-
-    this.children = this._makePropsProxy(children) as Record<
-      string,
-      Component
-    >;
-    this._lists = this._makePropsProxy(lists) as Record<
-      string,
-      Component[]
-    >;
-
+    this.children = this.makePropsProxy(children);
+    this.lists = this.makePropsProxy(lists);
     this.__id = this.settings.withInternalId ? makeUID() : null;
-
-    this.props = this._makePropsProxy({
+    this.props = this.makePropsProxy({
       ...props,
       _id: this.__id,
-    }) as TProps;
+    } as TProps);
+    this.eventBusRef = () => eventBus;
 
-    this.eventBus = () => eventBus;
-
-    this._registerEvents(eventBus);
-
+    this.registerEvents(eventBus);
     eventBus.emit(Component.EVENTS.INIT);
   }
 
-  //system
-
-  private _init() {
-    this._createResources();
-
-    this._applyAttributes();
-
+  private init() {
+    this.createResources();
+    this.applyAttributes();
     this.eventBus().emit(Component.EVENTS.RENDER);
-    this.eventBus().emit(Component.EVENTS.BEFORE_MOUNT);
-    this.eventBus().emit(Component.EVENTS.MOUNT);
+
+    queueMicrotask(() => {
+      this.eventBus().emit(Component.EVENTS.BEFORE_MOUNT);
+      this.eventBus().emit(Component.EVENTS.MOUNT);
+    });
   }
 
-  private _beforeMounted() {
+  private beforeMounted() {
     this.beforeMount();
   }
 
-  private _mounted(oldProps: TProps) {
+  private mounted(oldProps: TProps) {
     this.componentDidMount(oldProps);
-    if (!this.children) return;
 
-    Object.values(this.children).forEach((child) =>
-      child.dispatchComponentDidMount(),
-    );
+    Object.values(this.children).forEach((child) => {
+      child.dispatchComponentDidMount();
+    });
   }
 
-  private _updated(_oldProps: TProps, newProps: TProps) {
-    const response = this.componentDidUpdate(_oldProps, newProps);
+  private updated(oldProps: TProps, newProps: TProps) {
+    const shouldRender = this.componentDidUpdate(oldProps, newProps);
 
-    if (!response || _oldProps === newProps) {
+    if (!shouldRender || oldProps === newProps) {
       return;
     }
 
-    this._render();
+    this.renderInternal();
   }
 
-  private _beforeUnmounted() {
+  private beforeUnmounted() {
     this.beforeComponentUnmount();
   }
 
-  protected _remove() {
-    this._removeEvents();
+  protected remove() {
+    this.removeEvents();
 
     Object.values(this.children).forEach((child) => {
       child.dispatchComponentDidUnmount();
     });
 
-    Object.values(this._lists).forEach((list) => {
+    Object.values(this.lists).forEach((list) => {
       list.forEach((item) => {
         if (item instanceof Component) {
           item.dispatchComponentDidUnmount();
@@ -134,181 +135,199 @@ export default abstract class Component<
       });
     });
 
-    if (this._element) {
-      this._element.remove();
-    }
+    this.elementNode?.remove();
   }
 
-  private _unmounted() {
-    this._beforeUnmounted();
-
-    this._remove();
-
+  private unmounted() {
+    this.beforeUnmounted();
+    this.remove();
     this.componentDidUnmount();
-
-    this._element = null;
+    this.elementNode = null;
   }
 
-  private _render() {
+  private renderInternal() {
     const block = this.render();
-
     const compiledBlock = this.compile(block, this.props);
 
-    if (!this._element) throw new Error('no element to render!');
+    if (!this.elementNode) {
+      throw new Error('No element to render');
+    }
 
-    this._removeEvents();
-
-    this._element.innerHTML = '';
-
-    this._element.appendChild(compiledBlock);
-
-    this._addEvents();
+    this.removeEvents();
+    this.elementNode.innerHTML = '';
+    this.elementNode.appendChild(compiledBlock);
+    this.addEvents();
   }
 
-  //utils
-
-  private _registerEvents(eventBus: EventBus) {
-    eventBus.on(Component.EVENTS.INIT, this._init.bind(this));
-    eventBus.on(
-      Component.EVENTS.BEFORE_MOUNT,
-      this._beforeMounted.bind(this),
-    );
-    eventBus.on(Component.EVENTS.MOUNT, this._mounted.bind(this));
-    eventBus.on(Component.EVENTS.UPDATED, this._updated.bind(this));
-    eventBus.on(Component.EVENTS.UNMOUNTED, this._unmounted.bind(this));
-    eventBus.on(Component.EVENTS.RENDER, this._render.bind(this));
+  private registerEvents(eventBus: EventBus) {
+    eventBus.on(Component.EVENTS.INIT, this.init.bind(this));
+    eventBus.on(Component.EVENTS.BEFORE_MOUNT, this.beforeMounted.bind(this));
+    eventBus.on(Component.EVENTS.MOUNT, this.mounted.bind(this));
+    eventBus.on(Component.EVENTS.UPDATED, this.updated.bind(this));
+    eventBus.on(Component.EVENTS.UNMOUNTED, this.unmounted.bind(this));
+    eventBus.on(Component.EVENTS.RENDER, this.renderInternal.bind(this));
   }
 
-  private _createDocumentElement(tagName: string) {
+  private createDocumentElement<TTag extends keyof HTMLElementTagNameMap>(
+    tagName: TTag,
+  ): HTMLElementTagNameMap[TTag] {
     const element = document.createElement(tagName);
 
-    if (this.settings.withInternalId) {
-      element.setAttribute('data-id', this.__id as string);
+    if (this.settings.withInternalId && this.__id) {
+      element.setAttribute('data-id', this.__id);
     }
 
     return element;
   }
 
-  private _createResources() {
-    if (!this._meta) throw new Error('no meta');
+  private createResources() {
+    if (!this.meta) {
+      throw new Error('No component metadata');
+    }
 
-    const { tagName } = this._meta;
-    this._element = this._createDocumentElement(tagName);
+    this.elementNode = this.createDocumentElement(this.meta.tagName);
   }
 
-  private _makePropsProxy(
-    props:
-      | TProps
-      | Record<string, Component>
-      | Record<string, Component[]>,
-  ) {
-    return new Proxy(
-      props as Mutable<TProps> | Record<string, Component>,
-      {
-        set: (target, key, newValue: unknown) => {
-          if (target[key.toString()] !== newValue) {
-            (target as Record<string, unknown>)[key.toString()] = newValue;
-            this._setUpdate = true;
-          }
+  private makePropsProxy<TObject extends object>(props: TObject): TObject {
+    return new Proxy(props as Mutable<TObject>, {
+      set: (target, key, value) => {
+        const property = key as keyof TObject;
 
-          return true;
-        },
+        if (target[property] !== value) {
+          target[property] = value as Mutable<TObject>[keyof TObject];
+          this.shouldUpdate = true;
+        }
 
-        get: (target, key) => {
-          const store = target as Record<string | symbol, unknown>;
-
-          const value = store[key.toString()];
-          return typeof value === 'function' ? value.bind(target) : value;
-        },
-
-        deleteProperty() {
-          throw new Error('Нет доступа');
-        },
+        return true;
       },
-    );
+
+      get: (target, key) => {
+        const property = key as keyof TObject;
+        const value = target[property];
+
+        if (typeof value === 'function') {
+          return value.bind(target);
+        }
+
+        return value;
+      },
+
+      deleteProperty() {
+        throw new Error('No access');
+      },
+    });
   }
 
-  private _applyAttributes() {
+  private applyAttributes() {
+    if (!this.elementNode) {
+      return;
+    }
+
     const { className, attrs } = this.props;
 
     if (className) {
-      this._element!.className = className;
+      this.elementNode.className = className;
     }
 
-    if (attrs) {
-      Object.entries(attrs).forEach(([k, v]) =>
-        this._element!.setAttribute(k, String(v)),
-      );
+    if (!attrs) {
+      return;
     }
-  }
 
-  private _getChildren(propsAndChildren: IProps) {
-    const children = {} as Record<string, Component>;
-    const props = {} as Record<string, unknown>;
-    const lists: Record<string, Component[]> = {};
-    Object.entries(propsAndChildren).forEach(([key, value]) => {
-      if (value instanceof Component) {
-        children[key] = value;
-      } else if (Array.isArray(value)) {
-        lists[key] = value;
-      } else {
-        props[key] = value;
-      }
+    Object.entries(attrs).forEach(([attribute, value]) => {
+      this.elementNode?.setAttribute(attribute, value);
     });
-
-    return { children, props: props as TProps, lists };
   }
 
-  private compile(
-    template: Handlebars.TemplateDelegate,
-    props: Record<string, unknown>,
-  ): DocumentFragment {
-    if (typeof props === 'undefined') {
-      props = this.props;
-    }
+  private splitProps(propsAndChildren: TProps) {
+    const children: ComponentChildren = {};
+    const props: Partial<TProps> = {};
+    const lists: ComponentLists = {};
 
-    const propsAndStubs = { ...props };
+    const assignProp = <TKey extends keyof TProps>(
+      key: TKey,
+      value: TProps[TKey],
+    ) => {
+      props[key] = value;
+    };
+
+    (Object.entries(propsAndChildren) as Array<[keyof TProps, TProps[keyof TProps]]>).forEach(
+      ([key, value]) => {
+        if (value instanceof Component) {
+          children[String(key)] = value;
+          return;
+        }
+
+        if (Array.isArray(value)) {
+          lists[String(key)] = value as ListItem[];
+          return;
+        }
+
+        assignProp(key, value);
+      },
+    );
+
+    return {
+      children,
+      props: props as TProps,
+      lists,
+    };
+  }
+
+  private compile(template: TemplateDelegate, props: TProps): DocumentFragment {
+    const propsAndStubs: Record<string, TemplateValue> = {};
+
+    (Object.entries(props) as Array<[keyof TProps, TProps[keyof TProps]]>).forEach(
+      ([key, value]) => {
+        if (
+          typeof value === 'string' ||
+          typeof value === 'number' ||
+          typeof value === 'boolean' ||
+          value === null ||
+          value === undefined
+        ) {
+          propsAndStubs[String(key)] = value as TemplateValue;
+        }
+      },
+    );
 
     Object.entries(this.children).forEach(([key, child]) => {
       propsAndStubs[key] = `<template data-id="${child.__id}"></template>`;
     });
 
-    Object.entries(this._lists).forEach(([key, _child]) => {
+    Object.keys(this.lists).forEach((key) => {
       propsAndStubs[key] = `<template data-id="__l_${key}"></template>`;
     });
 
-    const fragment = this._createDocumentElement(
-      'template',
-    ) as HTMLTemplateElement;
+    const fragment = this.createDocumentElement('template');
     fragment.innerHTML = template(propsAndStubs);
 
     Object.values(this.children).forEach((child) => {
-      const stub = fragment.content.querySelector(
-        `[data-id="${child.__id}"]`,
-      );
+      const stub = fragment.content.querySelector(`[data-id="${child.__id}"]`);
+      const childContent = child.getContent();
 
-      if (stub) {
-        stub.replaceWith(child.getContent() as HTMLElement);
+      if (stub && childContent) {
+        stub.replaceWith(childContent);
       }
     });
 
-    Object.entries(this._lists).forEach(([key, child]) => {
-      const stub = fragment.content.querySelector(
-        `[data-id="__l_${key}"]`,
-      );
+    Object.entries(this.lists).forEach(([key, list]) => {
+      const stub = fragment.content.querySelector(`[data-id="__l_${key}"]`);
+      if (!stub) {
+        return;
+      }
 
-      if (!stub) return;
+      const listContent = this.createDocumentElement('template');
 
-      const listContent = this._createDocumentElement(
-        'template',
-      ) as HTMLTemplateElement;
-
-      child.forEach((item) => {
+      list.forEach((item) => {
         if (item instanceof Component) {
-          listContent.content.append(item.getContent() as Node);
-        } else {
-          listContent.content.append(`${item}`);
+          const content = item.getContent();
+          if (content) {
+            listContent.content.append(content);
+          }
+          return;
         }
+
+        listContent.content.append(String(item));
       });
 
       stub.replaceWith(listContent.content);
@@ -317,23 +336,32 @@ export default abstract class Component<
     return fragment.content;
   }
 
-  private _removeEvents() {
-    if (!this.props['events']) return;
+  private removeEvents() {
+    if (!this.elementNode) {
+      return;
+    }
 
-    Object.entries(this.props['events']).forEach(([event, handler]) => {
-      this._element!.removeEventListener(event, handler);
+    Object.entries(this.activeEvents).forEach(([event, handler]) => {
+      this.elementNode?.removeEventListener(event, handler);
+    });
+
+    this.activeEvents = {};
+  }
+
+  private addEvents() {
+    if (!this.elementNode) {
+      return;
+    }
+
+    Object.entries(this.props.events ?? {}).forEach(([event, handler]) => {
+      if (handler) {
+        const boundHandler = handler.bind(this) as ComponentEventHandler;
+        this.activeEvents[event] = boundHandler;
+        this.elementNode?.addEventListener(event, boundHandler);
+      }
     });
   }
 
-  private _addEvents() {
-    const { events = {} } = this.props;
-
-    Object.entries(events).forEach(([event, handler]) => {
-      this._element!.addEventListener(event, handler);
-    });
-  }
-
-  //user overrides
   public abstract render(): TemplateDelegate;
 
   public beforeMount() {}
@@ -353,33 +381,37 @@ export default abstract class Component<
   }
 
   public beforeComponentUnmount() {}
+
   public componentDidUnmount() {}
 
-  //public
-  public setProps = (nextProps: Record<string, unknown>) => {
-    if (!nextProps) {
-      return;
-    }
-
-    this._setUpdate = false;
+  public setProps(nextProps: Partial<TProps>) {
+    this.shouldUpdate = false;
 
     const oldValue = { ...this.props };
+    const { children, props, lists } = this.splitProps({
+      ...this.props,
+      ...nextProps,
+    });
 
-    const { children, props } = this._getChildren(nextProps);
-
-    if (Object.values(children).length)
+    if (Object.keys(children).length > 0) {
       Object.assign(this.children, children);
+    }
 
-    if (Object.values(props).length) {
+    if (Object.keys(lists).length > 0) {
+      Object.assign(this.lists, lists);
+    }
+
+    if (Object.keys(props).length > 0) {
       Object.assign(this.props, props);
     }
 
-    if (this._setUpdate)
+    if (this.shouldUpdate) {
       this.eventBus().emit(Component.EVENTS.UPDATED, oldValue, this.props);
-  };
+    }
+  }
 
   public get element() {
-    return this._element;
+    return this.elementNode;
   }
 
   public getContent() {
@@ -387,16 +419,23 @@ export default abstract class Component<
   }
 
   public show() {
-    this.getContent()!.style.display = 'block';
+    const content = this.getContent();
+    if (content) {
+      content.style.display = 'block';
+    }
   }
 
   public hide() {
-    if (this._element) {
-      this._element.style.display = 'none';
+    if (this.elementNode) {
+      this.elementNode.style.display = 'none';
     }
   }
 
   public destroy() {
     this.dispatchComponentDidUnmount();
+  }
+
+  protected eventBus() {
+    return this.eventBusRef();
   }
 }

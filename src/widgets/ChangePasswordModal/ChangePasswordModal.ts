@@ -1,12 +1,17 @@
 import { UpdatePasswordForm } from '@features/updateProfile';
 import _template from '@shared/lib/components/_templator';
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import { Routes } from '@shared/lib/router/routes';
 import { Link } from '@shared/ui/Link';
 import { Modal } from '@shared/ui/Modal';
 import type { TemplateDelegate } from 'handlebars';
 
-class ChangePasswordModal extends Component {
+interface ChangePasswordModalProps extends ComponentProps {
+  UpdatePasswordForm: UpdatePasswordForm;
+  Link: Link;
+}
+
+class ChangePasswordModal extends Component<ChangePasswordModalProps> {
   constructor() {
     super('section', {
       UpdatePasswordForm: new UpdatePasswordForm(),

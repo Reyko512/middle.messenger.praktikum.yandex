@@ -1,21 +1,40 @@
 .send-message-button {
-  background: none;
-  outline: none;
-  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--filter-white);
+  border-radius: 50%;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 13%), rgb(255 255 255 / 4%)),
+    rgb(255 255 255 / 4%);
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    transform 0.2s ease-out,
+    border-color 0.2s ease-out,
+    background 0.2s ease-out;
 
   svg {
+    transform: translateX(1px);
+
     path {
       transition: fill 0.3s ease-in-out;
     }
   }
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
+    border-color: var(--teal);
+    background: var(--teal);
+    transform: translateY(-1px);
+
     svg {
       path {
-        fill: var(--teal);
+        fill: var(--dark-primary);
+        fill-opacity: 1;
       }
     }
   }

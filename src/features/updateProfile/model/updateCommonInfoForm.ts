@@ -1,3 +1,4 @@
+import type { FormFieldConfig } from '@shared/lib/form/formController';
 import type { FormValidator } from '@shared/lib/form/formValidator';
 import {
   required,
@@ -7,16 +8,19 @@ import {
   email,
 } from '@shared/lib/form/validationRules';
 
-type Input = {
-  label: string;
-  id: string;
-  name: string;
-  type: 'text' | 'tel';
-  autocomplete: string;
-  value: '';
-};
+type UpdateCommonInfoFieldName =
+  | 'email'
+  | 'login'
+  | 'first_name'
+  | 'second_name'
+  | 'display_name'
+  | 'phone';
+export type UpdateCommonInfoFormValues = Record<
+  UpdateCommonInfoFieldName,
+  string
+>;
 
-export const inputsUpdateCommonInfo: Input[] = [
+export const inputsUpdateCommonInfo = [
   {
     label: 'email',
     id: 'email',
@@ -65,9 +69,11 @@ export const inputsUpdateCommonInfo: Input[] = [
     autocomplete: 'tel',
     value: '',
   },
-];
+ ] as const satisfies readonly FormFieldConfig<UpdateCommonInfoFieldName>[];
 
-export const setValidationRules = (value: FormValidator) => {
+export const setValidationRules = (
+  value: FormValidator<UpdateCommonInfoFormValues>,
+) => {
   value
     .addRule('first_name', required(), personName)
     .addRule('second_name', required(), personName)

@@ -1,10 +1,12 @@
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import ButtonTemp from './ButtonSend.hbs';
 
 import type { TemplateDelegate } from 'handlebars';
 
-export default class ButtonSend extends Component {
-  constructor(props: Record<string, unknown>) {
+interface ButtonSendProps extends ComponentProps {}
+
+export default class ButtonSend extends Component<ButtonSendProps> {
+  constructor(props: ButtonSendProps = {}) {
     super('button', {
       ...props,
       attrs: {

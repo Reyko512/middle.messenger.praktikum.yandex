@@ -1,16 +1,19 @@
 import { Route } from './route';
-import type Component from '@shared/lib/components/Component';
-import { Routes } from './routes';
+import Component from '@shared/lib/components/Component';
+import type { ComponentProps } from '@shared/lib/components/Component';
 import EventBus from '../EventBus/EventBus';
+
+interface RouteOptions {
+  guard?: () => boolean | string;
+}
 
 export class Router {
   static __instance: Router;
-  routes: Route[] = [];
-  history: History = window.history;
-  _currentRoute: Route | null = null;
-  _currentModal: Route | null = null;
-  _rootQuery: string = '#app';
-  public _eventBus: EventBus = new EventBus();
+  private routes: Route[] = [];
+  private readonly history: History = window.history;
+  private currentRoute: Route | null = null;
+  private readonly rootQuery: string = '#app';
+  public readonly eventBus: EventBus = new EventBus();
 
   static EVENTS = {
     START: 'routing:start',
@@ -22,132 +25,103 @@ export class Router {
       return Router.__instance;
     }
 
-    this.routes = [];
-    this.history = window.history;
-    this._currentRoute = null;
-    this._rootQuery = rootQuery;
-
+    this.rootQuery = rootQuery;
     Router.__instance = this;
   }
 
-  use(
+  public use(
     pathname: string,
-    block: new (props: unknown) => Component,
-    props: Record<string, unknown> = {},
+    block: new (props: ComponentProps & RouteOptions) => Component<ComponentProps>,
+    props: RouteOptions = {},
   ) {
     const route = new Route(pathname, block, {
-      rootQuery: this._rootQuery,
+      rootQuery: this.rootQuery,
       ...props,
     });
-
     this.routes.push(route);
     return this;
   }
 
-  start() {
+  public start() {
     window.addEventListener('popstate', () => {
-      this._onRoute(window.location.pathname);
+      void this.onRoute(window.location.pathname);
     });
 
-    this._onRoute(window.location.pathname);
+    void this.onRoute(window.location.pathname);
   }
 
-  async _onRoute(pathname: string) {
-    this._eventBus.emit(Router.EVENTS.START);
+  private async onRoute(pathname: string) {
+    this.eventBus.emit(Router.EVENTS.START);
 
     try {
-      const route = this.getRoute(pathname);
+      let nextPathname = pathname;
+      let route = this.getRoute(nextPathname) ?? this.getRoute('*');
+      let redirectCount = 0;
 
       if (!route) {
-        const notFoundRoute = this.routes.find((r) => r.pathname === '*');
-        if (notFoundRoute) {
-          if (this._currentRoute && this._currentRoute !== notFoundRoute) {
-            await this._currentRoute.leave();
-          }
-          this._currentRoute = notFoundRoute;
-          await notFoundRoute.render();
-        }
         return;
       }
 
-      if (route.guard) {
-        const guardResult = route.guard();
+      while (route) {
+        const guardResult = route.guard?.() ?? true;
 
         if (typeof guardResult === 'string') {
-          this._eventBus.emit(Router.EVENTS.END);
-          this.go(guardResult);
-          return;
+          if (guardResult === nextPathname || redirectCount >= this.routes.length) {
+            return;
+          }
+
+          this.history.replaceState({}, '', guardResult);
+          nextPathname = guardResult;
+          route = this.getRoute(nextPathname) ?? this.getRoute('*');
+          redirectCount += 1;
+          continue;
         }
 
         if (guardResult === false) {
           return;
         }
+
+        break;
       }
 
-      if (route.isModal) {
-        if (this._currentModal === route) return;
-
-        if (!this._currentRoute) {
-          this.history.replaceState({}, '', Routes.Messenger);
-          this.history.pushState({}, '', pathname);
-
-          const backgroundRoute = this.getRoute(Routes.Messenger);
-          if (backgroundRoute) {
-            this._currentRoute = backgroundRoute;
-            await backgroundRoute.render();
-          }
-        }
-
-        if (this._currentModal) {
-          await this._currentModal.leave();
-        }
-
-        this._currentModal = route;
-        await route.render();
+      if (!route) {
         return;
       }
 
-      if (this._currentModal) {
-        await this._currentModal.leave();
-        this._currentModal = null;
-      }
-
-      if (this._currentRoute === route) {
+      if (this.currentRoute === route) {
         return;
       }
 
-      if (this._currentRoute) {
-        await this._currentRoute.leave();
+      if (this.currentRoute) {
+        await this.currentRoute.leave();
       }
 
-      this._currentRoute = route;
+      this.currentRoute = route;
       await route.render();
     } finally {
-      this._eventBus.emit(Router.EVENTS.END);
+      this.eventBus.emit(Router.EVENTS.END);
     }
   }
 
-  go(pathname: string) {
-    const nextRoute = this.getRoute(pathname);
-
-    if (this._currentModal && nextRoute && nextRoute.isModal) {
+  public go(pathname: string, options: { replace?: boolean } = {}) {
+    if (options.replace) {
       this.history.replaceState({}, '', pathname);
     } else {
       this.history.pushState({}, '', pathname);
     }
 
-    this._onRoute(pathname);
+    void this.onRoute(pathname);
   }
 
-  back() {
+  public back() {
     this.history.back();
   }
 
-  forward() {
+  public forward() {
     this.history.forward();
   }
 
-  getRoute(pathname: string) {
+  public getRoute(pathname: string) {
     return this.routes.find((route) => route.match(pathname));
   }
 }

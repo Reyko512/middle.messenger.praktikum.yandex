@@ -1,0 +1,15 @@
+{{#if isVisible}}
+  <section class="global-toast" role="status" aria-live="polite">
+    <div class="global-toast__content">
+      <p class="global-toast__message">{{message}}</p>
+      <button
+        class="global-toast__close"
+        type="button"
+        data-role="global-toast-close"
+        aria-label="Dismiss notification"
+      >
+        Close
+      </button>
+    </div>
+  </section>
+{{/if}}

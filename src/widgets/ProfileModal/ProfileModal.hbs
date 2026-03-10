@@ -1,0 +1,61 @@
+<button
+  class="{{triggerClassName}}"
+  type="button"
+  data-role="profile-modal-trigger"
+>
+  {{triggerText}}
+</button>
+
+{{#if isOverviewOpen}}
+  <section class="profile-modal" data-role="profile-modal-backdrop">
+    <section class="profile-modal__content">
+      <header class="profile-modal__header">
+        <p>Profile</p>
+        <button type="button" data-role="profile-modal-close">Close</button>
+      </header>
+      {{{UpdateAvatarForm}}}
+      <ul class="profile-modal__data">
+        {{{profileData}}}
+      </ul>
+      <nav class="profile-modal__actions">
+        <button
+          class="profile-modal__action-link"
+          type="button"
+          data-role="open-profile-info"
+        >
+          Change user data
+        </button>
+        <button
+          class="profile-modal__action-link"
+          type="button"
+          data-role="open-profile-password"
+        >
+          Change password
+        </button>
+        {{{LogoutButton}}}
+      </nav>
+    </section>
+  </section>
+{{/if}}
+
+{{#if isInfoOpen}}
+  <section class="profile-modal" data-role="profile-modal-backdrop">
+    <section class="profile-modal__content profile-modal__content_form">
+      <button class="profile-modal__back" type="button" data-role="profile-modal-back">
+        &lt; back
+      </button>
+      {{{UpdateCommonInfoForm}}}
+    </section>
+  </section>
+{{/if}}
+
+{{#if isPasswordOpen}}
+  <section class="profile-modal" data-role="profile-modal-backdrop">
+    <section class="profile-modal__content profile-modal__content_form">
+      <button class="profile-modal__back" type="button" data-role="profile-modal-back">
+        &lt; back
+      </button>
+      {{{UpdatePasswordForm}}}
+    </section>
+  </section>
+{{/if}}

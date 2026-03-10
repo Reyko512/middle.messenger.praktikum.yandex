@@ -1,73 +1,73 @@
 [![Tests](https://github.com/Reyko512/middle.messenger.praktikum.yandex/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Reyko512/middle.messenger.praktikum.yandex/actions/workflows/tests.yml)
 
----
+## Messenger Byte
 
-## design: https://www.figma.com/design/ejSycYEFYGPpu8EfV1jZu6/messanger-byte?node-id=1-4&t=XGArgxmmIffhONdF-1
+Проект учебного мессенджера на TypeScript + Vite с FSD-структурой, строгой типизацией, роутингом, HTTP API и WebSocket.
 
-## netlify: https://charming-haupia-7d6657.netlify.app/
+## Функциональность
 
----
+- Роутинг страниц:
+  - `/` — вход
+  - `/sign-up` — регистрация
+  - `/settings` — профиль пользователя
+  - `/messenger` — чат
+- Работа браузерной истории:
+  - переходы по UI;
+  - кнопки браузера `Назад`/`Вперёд`;
+  - восстановление страницы после `F5`.
+- Авторизация:
+  - регистрация;
+  - вход;
+  - выход.
+- Профиль:
+  - изменение данных пользователя;
+  - изменение аватара;
+  - изменение пароля.
+- Чаты:
+  - загрузка списка чатов;
+  - создание чата;
+  - добавление пользователя в чат;
+  - удаление пользователя из чата.
+- Сообщения:
+  - real-time сообщения через WebSocket;
+  - загрузка истории сообщений;
+  - заглушка, если чат не выбран.
+- Безопасность:
+  - экранирование шаблонов Handlebars;
+  - санитизация пользовательского ввода (базовая защита от XSS);
+  - обработка ошибок HTTP и WebSocket.
 
-Проект находится в стадии активной разработки.
+## Технологии
 
-## **Ссылки на свёрстанные экраны**
+- TypeScript (`strict`)
+- Vite
+- Handlebars
+- SCSS
+- ESLint + Stylelint
+- Архитектура: FSD + MVC-подход
 
-**Домашний экран**
+## Запуск
 
-```url
-http://localhost:3000/
+```bash
+npm install
+npm run dev
 ```
 
-**Экран информации о пользователе и форма смены аватара**
+## Сборка
 
-```url
-http://localhost:3000/user-data
+```bash
+npm run build
+npm run preview
 ```
 
-**Форма изменения информации о пользователе**
+## Проверки
 
-```url
-http://localhost:3000/change-info
+```bash
+npm run lint:code
+npm run lint:style
+npx tsc --noEmit
 ```
 
-**Форма изменения пароля**
+## API
 
-```url
-http://localhost:3000/change-password
-```
-
-**Экран ошибки 500**
-
-```url
-http://localhost:3000/500
-```
-
-**Экран 404**
-
-```url
-http://localhost:3000/404
-```
-
-**Экран авторизации**
-
-```url
-http://localhost:3000/sign-in
-```
-
-**Экран регистрации**
-
-```url
-http://localhost:3000/sign-up
-```
-
-## **в дизайне экран настроек аккаунта реализован через модальное окно, поэтому его нет**
-
-## Установка
-
-- `npm install` — установка стабильной версии,
-- `npm run dev` — запуск версии для разработчика,
-- `npm run start` — сборка и запуск стабильной версии.
-
-## Описание
-
-Проект помогает людям коммуницировать друг с другом на расстоянии.
+- Swagger: https://ya-praktikum.tech/api/v2/swagger/#/

@@ -1,14 +1,41 @@
 .file-input {
   $root: &;
 
-  width: min-content;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 
   &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--filter-white);
+    border-radius: 50%;
+    background:
+      linear-gradient(135deg, rgb(255 255 255 / 11%), rgb(255 255 255 / 4%)),
+      rgb(255 255 255 / 4%);
     cursor: pointer;
+    transition:
+      border-color 0.2s ease-out,
+      background 0.2s ease-out,
+      transform 0.2s ease-out;
 
     path {
       transition: stroke 0.2s ease-in-out;
     }
+  }
+
+  &__name {
+    max-width: 156px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--floating-white);
+    font-size: 12px;
+    letter-spacing: 0.02em;
   }
 
   input {
@@ -17,6 +44,10 @@
 
   &:hover {
     #{$root}__icon {
+      border-color: var(--teal);
+      background: rgb(3 218 197 / 12%);
+      transform: translateY(-1px);
+
       path {
         stroke: var(--teal);
       }

@@ -1,5 +1,5 @@
 import _template from '@shared/lib/components/_templator';
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import UserModalTmp from './UserModal.hbs';
 
 import type { TemplateDelegate } from 'handlebars';
@@ -51,7 +51,13 @@ const linkArray: { text: string; href: string }[] = [
   },
 ];
 
-class UserModal extends Component {
+interface UserModalProps extends ComponentProps {
+  UpdateAvatarForm: UpdateAvatarForm;
+  userData: DataRow[];
+  links: Link[];
+}
+
+class UserModal extends Component<UserModalProps> {
   constructor() {
     super('section', {
       UpdateAvatarForm: new UpdateAvatarForm(),

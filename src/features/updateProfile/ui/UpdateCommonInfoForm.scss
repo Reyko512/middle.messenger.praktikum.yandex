@@ -4,4 +4,10 @@
   row-gap: 8px;
   align-items: center;
   justify-content: stretch;
+
+  &__error {
+    min-height: 20px;
+    font-size: 14px;
+    color: var(--primary-error);
+  }
 }
