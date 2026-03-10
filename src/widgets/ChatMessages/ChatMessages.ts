@@ -97,16 +97,16 @@ function formatDateDividerLabel(value: string) {
   yesterday.setDate(today.getDate() - 1);
 
   if (isSameDate(date, today)) {
-    return 'Сегодня';
+    return 'Today';
   }
 
   if (isSameDate(date, yesterday)) {
-    return 'Вчера';
+    return 'Yesterday';
   }
 
-  return date.toLocaleDateString('ru-RU', {
-    day: 'numeric',
+  return date.toLocaleDateString('en-US', {
     month: 'long',
+    day: 'numeric',
   });
 }
 
