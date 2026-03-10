@@ -1,37 +1,76 @@
 import { Input } from '@shared/ui/Input/';
+import type { InputProps } from '@shared/ui/Input/';
 import { FormValidator } from './formValidator';
 
-type FieldConfig = {
-  name: string;
-  type: string;
+export interface FormFieldConfig<TName extends string>
+  extends Pick<InputProps, 'autocomplete' | 'className' | 'id' | 'type'> {
+  label: string;
+  name: TName;
   value?: string;
+}
+
+type FieldName<TFields extends readonly FormFieldConfig<string>[]> =
+  TFields[number]['name'];
+
+export type FormValues<TFields extends readonly FormFieldConfig<string>[]> = {
+  [TField in TFields[number] as TField['name']]: string;
 };
 
-export class FormController {
-  private values: Record<string, string> = {};
-  private validator = new FormValidator();
+function createFormValues<TFields extends readonly FormFieldConfig<string>[]>(
+  fields: TFields,
+): FormValues<TFields> {
+  return Object.fromEntries(
+    fields.map((field) => [field.name, field.value ?? '']),
+  ) as FormValues<TFields>;
+}
+
+function isTextFieldTarget(
+  target: EventTarget | null,
+): target is HTMLInputElement | HTMLTextAreaElement {
+  return (
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement
+  );
+}
+
+function getFieldValue(event: Event) {
+  const target = event.target as EventTarget | null;
+
+  if (isTextFieldTarget(target)) {
+    return target.value;
+  }
+
+  return null;
+}
+
+export class FormController<TFields extends readonly FormFieldConfig<string>[]> {
+  private values: FormValues<TFields>;
+  private validator = new FormValidator<FormValues<TFields>>();
 
   public readonly inputs: Input[];
 
-  constructor(fields: FieldConfig[]) {
-    this.inputs = fields.map((field) => {
-      this.values[field.name] = field.value ?? '';
+  constructor(fields: TFields) {
+    this.values = createFormValues(fields);
 
-      const input: Input = new Input({
+    this.inputs = fields.map((field) => {
+      const fieldName = field.name as FieldName<TFields>;
+      const input = new Input({
         ...field,
-        value: this.values[field.name] ?? '',
+        value: this.values[fieldName] as string,
         error: '',
         events: {
-          input: (e: Event) => {
-            const value = (e.target as HTMLInputElement).value;
+          input: (event) => {
+            const value = getFieldValue(event);
 
-            this.values[field.name] = value;
+            if (value === null) {
+              return;
+            }
+
+            this.values[fieldName] = value as FormValues<TFields>[typeof fieldName];
             input.setProps({ value });
           },
-
           focusout: () => {
-            console.log('blured', field.name, field.value);
-            this.validateField(field.name);
+            this.validateField(fieldName);
           },
         },
       });
@@ -40,7 +79,9 @@ export class FormController {
     });
   }
 
-  public addRules(configure: (validator: FormValidator) => void) {
+  public addRules(
+    configure: (validator: FormValidator<FormValues<TFields>>) => void,
+  ) {
     configure(this.validator);
   }
 
@@ -48,18 +89,20 @@ export class FormController {
     const result = this.validator.validate(this.values);
 
     this.inputs.forEach((input) => {
+      const fieldName = input.props.name as keyof FormValues<TFields>;
       input.setProps({
-        error: result.errors[input.props.name as string] ?? '',
+        error: result.errors[fieldName] ?? '',
       });
     });
 
     return result;
   }
 
-  private validateField(name: string) {
-    const result = this.validator.validateField(name, this.values);
+  private validateField(field: keyof FormValues<TFields>) {
+    const result = this.validator.validateField(field, this.values);
+
     this.inputs.forEach((input) => {
-      if (input.props.name === name) {
+      if (input.props.name === field) {
         input.setProps({
           error: result ?? '',
         });
@@ -67,10 +110,53 @@ export class FormController {
     });
   }
 
-  public submit(onValid: (values: Record<string, string>) => void) {
+  public async submit(
+    onValid: (values: FormValues<TFields>) => Promise<void> | void,
+  ) {
     const result = this.validate();
+
     if (result.isValid) {
-      onValid({ ...this.values });
+      await onValid({ ...this.values });
     }
+  }
+
+  public getValues() {
+    return { ...this.values };
+  }
+
+  public setValues(nextValues: Partial<FormValues<TFields>>) {
+    Object.entries(nextValues).forEach(([name, value]) => {
+      if (typeof value !== 'string') {
+        return;
+      }
+
+      const fieldName = name as keyof FormValues<TFields>;
+      this.values[fieldName] = value as FormValues<TFields>[typeof fieldName];
+      const input = this.inputs.find((item) => item.props.name === name);
+
+      if (!input) {
+        return;
+      }
+
+      input.setProps({
+        value,
+        error: '',
+      });
+    });
+  }
+
+  public clear() {
+    (Object.keys(this.values) as Array<keyof FormValues<TFields>>).forEach(
+      (name) => {
+        this.values[name] = '' as FormValues<TFields>[typeof name];
+      },
+    );
+
+    this.inputs.forEach((input) => {
+      input.setProps({
+        value: '',
+        error: '',
+      });
+    });
   }
 }

@@ -1,20 +1,86 @@
-<div class="chats-page">
-    <aside class="info">
-        <header class="chat-utils">
-            {{{SettingsLink}}}
-            {{{Search}}}
-        </header>
-        {{{ChatFeed}}}
-    </aside>
-    <main class="chat">
-        {{{ChatInfoBar}}}
-        <section class="chat-view">
-            <p class="no-messages">
-                no messages yet...
-            </p>
-        </section>
-        {{{ SendMessageForm }}}
-    </main>
-</div>
+<aside class="info">
+  <header class="chat-utils">
+    {{{ProfileModal}}}
+    {{{CreateChatForm}}}
+    {{{Search}}}
+  </header>
+  {{{ChatFeed}}}
+</aside>
+<main class="{{chatClass}}">
+  {{#if isChatSelected}}
+    {{{ChatInfoBar}}}
+    <section class="chat-view">
+      {{{MessageList}}}
+      {{#if isChatLoading}}
+        <div class="chat-loader" aria-live="polite">
+          <div class="chat-loader__panel">
+            <div class="chat-loader__pulse" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <p class="chat-loader__title">Loading chat</p>
+            <p class="chat-loader__subtitle">Syncing Byte stream...</p>
+          </div>
+        </div>
+      {{else}}
+        {{#if isChatEmpty}}
+          <div class="chat-view__empty">
+            <p>No messages yet. Start the thread.</p>
+          </div>
+        {{/if}}
+      {{/if}}
+    </section>
+    {{{SendMessageForm}}}
+  {{else}}
+    <section class="chat__placeholder">
+      <p>Select a chat to start messaging</p>
+    </section>
+  {{/if}}
 
+  {{#if isChatSettingsOpen}}
+    <section class="chat-settings" data-role="chat-settings-backdrop">
+      <div class="chat-settings__content" data-role="chat-settings-modal">
+        <h3>Chat settings</h3>
+        {{{ChatParticipantForm}}}
+        {{#if isChatDeleteAvailable}}
+          <button class="chat-settings__delete" type="button" data-role="chat-settings-delete">
+            Delete chat
+          </button>
+        {{/if}}
+        <button class="chat-settings__close" type="button" data-role="chat-settings-close">Close</button>
+      </div>
+    </section>
+  {{/if}}
 
+  {{#if isDeleteChatConfirmOpen}}
+    <section class="chat-delete-confirm" data-role="chat-delete-backdrop">
+      <div class="chat-delete-confirm__content">
+        <button class="chat-delete-confirm__close" type="button" data-role="chat-delete-close">
+          Close
+        </button>
+        <p class="chat-delete-confirm__eyebrow">Danger zone</p>
+        <h3 class="chat-delete-confirm__title">Delete this chat?</h3>
+        <p class="chat-delete-confirm__text">
+          The current thread and its message history will be removed for everyone in this chat.
+        </p>
+        <div class="chat-delete-confirm__actions">
+          <button
+            class="chat-delete-confirm__action chat-delete-confirm__action_cancel"
+            type="button"
+            data-role="chat-delete-cancel"
+          >
+            Cancel
+          </button>
+          <button
+            class="chat-delete-confirm__action chat-delete-confirm__action_delete"
+            type="button"
+            data-role="chat-delete-confirm"
+          >
+            Delete chat
+          </button>
+        </div>
+      </div>
+    </section>
+  {{/if}}
+</main>

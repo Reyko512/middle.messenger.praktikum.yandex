@@ -1,9 +1,13 @@
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import { Link } from '@shared/ui/Link';
 import _404temp from './404.hbs';
 import type { TemplateDelegate } from 'handlebars';
 
-class _404 extends Component {
+interface NotFoundPageProps extends ComponentProps {
+  Link: Link;
+}
+
+export default class _404 extends Component<NotFoundPageProps> {
   constructor() {
     super('div', {
       attrs: {
@@ -18,5 +22,3 @@ class _404 extends Component {
     return _404temp;
   }
 }
-
-export default new _404();

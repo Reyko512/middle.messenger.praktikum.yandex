@@ -1,8 +1,8 @@
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import type { TemplateDelegate } from 'handlebars';
 import DataRowTemp from './DataRow.hbs';
 
-interface DataRowProps extends Record<string, unknown> {
+interface DataRowProps extends ComponentProps {
   name: string;
   value: string;
 }

@@ -1,11 +1,12 @@
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 
 import ModalTemp from './Modal.hbs';
 
 import type { TemplateDelegate } from 'handlebars';
+import { Router } from '@shared/lib/router/router';
 
-interface ModalProps extends Record<string, unknown> {
-  Content: Component;
+interface ModalProps extends ComponentProps {
+  Content: Component<ComponentProps>;
 }
 
 export default class Modal extends Component<ModalProps> {
@@ -14,6 +15,13 @@ export default class Modal extends Component<ModalProps> {
       ...props,
       attrs: {
         class: 'modal-background',
+      },
+      events: {
+        click: (e: Event) => {
+          if (e.target === e.currentTarget) {
+            Router.__instance.back();
+          }
+        },
       },
     });
   }

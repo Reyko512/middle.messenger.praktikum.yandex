@@ -1,46 +1,58 @@
-export type ValidatorRule<T = unknown> = (
-  value: T,
-  values: Record<string, unknown>,
+export type FormValuesMap = Record<string, string>;
+
+export type ValidatorRule<TValues extends FormValuesMap = FormValuesMap> = (
+  value: string,
+  values: TValues,
 ) => string | null;
 
-export class FormValidator {
-  private rules: Record<string, ValidatorRule[]> = {};
+export interface ValidationResult<TValues extends FormValuesMap> {
+  isValid: boolean;
+  errors: Partial<Record<keyof TValues, string>>;
+}
 
-  public addRule(field: string, ...rules: ValidatorRule[]): this {
-    if (!rules.length) return this;
+export class FormValidator<TValues extends FormValuesMap = FormValuesMap> {
+  private rules: Partial<Record<keyof TValues, ValidatorRule<TValues>[]>> = {};
 
-    if (!this.rules[field]) {
-      this.rules[field] = [];
+  public addRule(
+    field: keyof TValues,
+    ...rules: ValidatorRule<TValues>[]
+  ): this {
+    if (!rules.length) {
+      return this;
     }
 
-    this.rules[field].push(...rules);
+    const currentRules = this.rules[field] ?? [];
+    this.rules[field] = [...currentRules, ...rules];
     return this;
   }
 
-  private runRules(
-    field: string,
-    values: Record<string, unknown>,
-  ): string | null {
+  private runRules(field: keyof TValues, values: TValues): string | null {
     const rules = this.rules[field];
-    if (!rules) return null;
+    if (!rules) {
+      return null;
+    }
 
-    const value = values[field];
+    const value = values[field] ?? '';
 
     for (const rule of rules) {
       const error = rule(value, values);
-      if (error) return error;
+      if (error) {
+        return error;
+      }
     }
 
     return null;
   }
 
-  public validate(values: Record<string, unknown>) {
-    const errors: Record<string, string> = {};
+  public validate(values: TValues): ValidationResult<TValues> {
+    const errors: Partial<Record<keyof TValues, string>> = {};
 
-    for (const field of Object.keys(this.rules)) {
+    (Object.keys(this.rules) as Array<keyof TValues>).forEach((field) => {
       const error = this.runRules(field, values);
-      if (error) errors[field] = error;
-    }
+      if (error) {
+        errors[field] = error;
+      }
+    });
 
     return {
       isValid: Object.keys(errors).length === 0,
@@ -48,7 +60,7 @@ export class FormValidator {
     };
   }
 
-  public validateField(field: string, values: Record<string, unknown>) {
+  public validateField(field: keyof TValues, values: TValues) {
     return this.runRules(field, values);
   }
 }

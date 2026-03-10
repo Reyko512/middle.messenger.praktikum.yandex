@@ -5,103 +5,302 @@ enum METHOD {
   DELETE = 'DELETE',
 }
 
-type Options<T> = {
+type QueryParamPrimitive = string | number | boolean | null | undefined;
+type QueryParamValue =
+  | QueryParamPrimitive
+  | QueryParamValue[]
+  | { [key: string]: QueryParamValue };
+type QueryParams = Record<string, QueryParamValue>;
+
+type JSONPrimitive = string | number | boolean | null;
+type JSONValue = JSONPrimitive | JSONValue[] | { [key: string]: JSONValue };
+type JSONObject = { [key: string]: JSONValue };
+type HTTPErrorReason = JSONValue | undefined;
+
+type RequestData = object | FormData | undefined;
+
+type RequestOptions<TData extends RequestData = undefined> = {
   method: METHOD;
-  data?: T;
+  data?: TData;
   timeout?: number;
   headers?: Record<string, string>;
+  responseType?: XMLHttpRequestResponseType;
 };
 
-function queryStringify(data: Record<string, unknown>) {
-  if (typeof data !== 'object' || !data) {
-    throw new Error('Data must be object');
+type MethodOptions<TData extends RequestData> = Omit<
+  RequestOptions<TData>,
+  'method'
+>;
+
+const DEFAULT_TIMEOUT = 5000;
+
+function hasBody(method: METHOD) {
+  return method !== METHOD.GET;
+}
+
+function hasHeader(headers: Record<string, string>, headerName: string) {
+  const normalizedHeaderName = headerName.toLowerCase();
+
+  return Object.keys(headers).some(
+    (key) => key.toLowerCase() === normalizedHeaderName,
+  );
+}
+
+function isQueryParamValue(value: RequestData | QueryParamValue): value is QueryParamValue {
+  if (
+    value === null ||
+    value === undefined ||
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
+    return true;
   }
 
-  const keys = Object.keys(data);
+  if (Array.isArray(value)) {
+    return value.every((item) => isQueryParamValue(item));
+  }
 
-  const encodeDataValue = (value: unknown) => {
-    if (value === undefined || Object.is(value, null)) return value;
+  if (value instanceof FormData || typeof value !== 'object') {
+    return false;
+  }
 
-    if (value === Object) return value;
+  return Object.values(value).every((item) => isQueryParamValue(item));
+}
+
+function isQueryParams(data: RequestData): data is QueryParams {
+  if (!data || data instanceof FormData || Array.isArray(data)) {
+    return false;
+  }
+
+  return isQueryParamValue(data);
+}
+
+function queryStringify(data: QueryParams) {
+  const query: string[] = [];
+
+  const encodeKey = (key: string) => encodeURIComponent(key);
+
+  const visit = (key: string, value: QueryParamValue) => {
+    if (value === null || value === undefined) {
+      return;
+    }
 
     if (
       typeof value === 'string' ||
       typeof value === 'number' ||
       typeof value === 'boolean'
     ) {
-      return encodeURIComponent(value);
+      query.push(`${key}=${encodeURIComponent(String(value))}`);
+      return;
     }
 
-    return value;
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => {
+        visit(`${key}[${index}]`, item);
+      });
+      return;
+    }
+
+    Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+      visit(`${key}[${encodeKey(nestedKey)}]`, nestedValue);
+    });
   };
 
-  return keys.reduce((result, key, index) => {
-    return `${result}${key}=${encodeDataValue(data[key])}${index < keys.length - 1 ? '&' : ''}`;
-  }, '?');
-}
+  Object.entries(data).forEach(([key, value]) => {
+    visit(encodeKey(key), value);
+  });
 
-type HTTPMethod<TData = unknown> = (
-  url: string,
-  options?: Omit<Options<TData>, 'method'>,
-) => Promise<XMLHttpRequest>;
-
-export default class HTTPTransport {
-  private createMethod<TData = unknown>(
-    method: METHOD,
-  ): HTTPMethod<TData> {
-    return (url, options = {}) =>
-      this.request(url, { ...options, method });
+  if (!query.length) {
+    return '';
   }
 
-  get = this.createMethod(METHOD.GET);
+  return `?${query.join('&')}`;
+}
 
-  post = this.createMethod(METHOD.POST);
+function buildRequestUrl(
+  baseUrl: string,
+  url: string,
+  method: METHOD,
+  data: RequestData,
+) {
+  if (method === METHOD.GET && isQueryParams(data)) {
+    return `${baseUrl}${url}${queryStringify(data)}`;
+  }
 
-  put = this.createMethod(METHOD.PUT);
+  return `${baseUrl}${url}`;
+}
 
-  delete = this.createMethod(METHOD.DELETE);
+function buildHeaders(
+  method: METHOD,
+  data: RequestData,
+  headers: Record<string, string> = {},
+) {
+  if (
+    !hasBody(method) ||
+    data === undefined ||
+    data instanceof FormData ||
+    hasHeader(headers, 'Content-Type')
+  ) {
+    return headers;
+  }
 
-  request = (
+  return {
+    ...headers,
+    'Content-Type': 'application/json',
+  };
+}
+
+function buildRequestBody(data: RequestData) {
+  if (data === undefined) {
+    return undefined;
+  }
+
+  if (data instanceof FormData) {
+    return data;
+  }
+
+  return JSON.stringify(data);
+}
+
+function parseResponseBody<TResponse>(
+  xhr: XMLHttpRequest,
+  responseType: XMLHttpRequestResponseType,
+): TResponse {
+  if (responseType && responseType !== 'text') {
+    return xhr.response as TResponse;
+  }
+
+  const responseText = xhr.responseText;
+
+  if (!responseText) {
+    return undefined as TResponse;
+  }
+
+  const contentType = xhr.getResponseHeader('Content-Type') ?? '';
+  if (contentType.includes('application/json')) {
+    return JSON.parse(responseText) as TResponse;
+  }
+
+  return responseText as TResponse;
+}
+
+export class HTTPError extends Error {
+  public readonly status: number;
+  public readonly reason: HTTPErrorReason;
+
+  constructor(status: number, reason: HTTPErrorReason) {
+    super(`HTTP ${status}`);
+    this.status = status;
+    this.reason = reason;
+  }
+}
+
+export default class HTTPTransport {
+  private readonly baseUrl: string;
+
+  constructor(baseUrl = '') {
+    this.baseUrl = baseUrl;
+  }
+
+  public get<TResponse, TData extends object = QueryParams>(
     url: string,
-    options: Options<unknown>,
-  ): Promise<XMLHttpRequest> => {
-    const { headers = {}, method, data } = options;
+    options?: MethodOptions<TData>,
+  ) {
+    return this.request<TResponse, TData>(url, {
+      ...options,
+      method: METHOD.GET,
+    });
+  }
 
-    return new Promise(function (resolve, reject) {
-      if (!method) {
-        reject('No method');
+  public post<TResponse, TData extends RequestData = JSONObject>(
+    url: string,
+    options?: MethodOptions<TData>,
+  ) {
+    return this.request<TResponse, TData>(url, {
+      ...options,
+      method: METHOD.POST,
+    });
+  }
+
+  public put<TResponse, TData extends RequestData = JSONObject>(
+    url: string,
+    options?: MethodOptions<TData>,
+  ) {
+    return this.request<TResponse, TData>(url, {
+      ...options,
+      method: METHOD.PUT,
+    });
+  }
+
+  public delete<TResponse, TData extends RequestData = JSONObject>(
+    url: string,
+    options?: MethodOptions<TData>,
+  ) {
+    return this.request<TResponse, TData>(url, {
+      ...options,
+      method: METHOD.DELETE,
+    });
+  }
+
+  public request<TResponse, TData extends RequestData = undefined>(
+    url: string,
+    options: RequestOptions<TData>,
+  ): Promise<TResponse> {
+    const {
+      method,
+      data,
+      headers = {},
+      timeout = DEFAULT_TIMEOUT,
+      responseType = '',
+    } = options;
+
+    return new Promise<TResponse>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      const requestUrl = buildRequestUrl(this.baseUrl, url, method, data);
+      const requestHeaders = buildHeaders(method, data, headers);
+
+      xhr.open(method, requestUrl);
+      xhr.timeout = timeout;
+      xhr.withCredentials = true;
+      xhr.responseType = responseType;
+
+      Object.entries(requestHeaders).forEach(([headerName, headerValue]) => {
+        xhr.setRequestHeader(headerName, headerValue);
+      });
+
+      xhr.onload = () => {
+        const payload = parseResponseBody<TResponse | HTTPErrorReason>(
+          xhr,
+          responseType,
+        );
+
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(payload as TResponse);
+          return;
+        }
+
+        reject(new HTTPError(xhr.status, payload as HTTPErrorReason));
+      };
+
+      xhr.onerror = () => {
+        reject(new Error('Network error'));
+      };
+
+      xhr.onabort = () => {
+        reject(new Error('Request aborted'));
+      };
+
+      xhr.ontimeout = () => {
+        reject(new Error('Request timeout'));
+      };
+
+      if (!hasBody(method) || data === undefined) {
+        xhr.send();
         return;
       }
 
-      const xhr = new XMLHttpRequest();
-      const isGet = method === METHOD.GET;
-
-      xhr.open(
-        method,
-        isGet && !!data
-          ? `${url}${queryStringify(data as Record<string, unknown>)}`
-          : url,
-      );
-
-      Object.keys(headers).forEach((key) => {
-        xhr.setRequestHeader(key, headers[key] as string);
-      });
-
-      xhr.onload = function () {
-        resolve(xhr);
-      };
-
-      xhr.onabort = reject;
-      xhr.onerror = reject;
-
-      xhr.timeout = options.timeout ?? 0;
-      xhr.ontimeout = reject;
-
-      if (isGet || !data) {
-        xhr.send();
-      } else {
-        xhr.send(data as Document | XMLHttpRequestBodyInit);
-      }
+      xhr.send(buildRequestBody(data));
     });
-  };
+  }
 }

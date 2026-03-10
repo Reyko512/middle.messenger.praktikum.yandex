@@ -1,5 +1,4 @@
-import _template from '@shared/lib/components/_templator';
-import Component from '@shared/lib/components/Component';
+import Component, { type ComponentProps } from '@shared/lib/components/Component';
 import UserModalTmp from './UserModal.hbs';
 
 import type { TemplateDelegate } from 'handlebars';
@@ -39,19 +38,25 @@ const userDataArray: { name: string; value: string }[] = [
 const linkArray: { text: string; href: string }[] = [
   {
     text: 'Change user data',
-    href: `/${Routes.ChangeInfo}`,
+    href: `${Routes.ChangeInfo}`,
   },
   {
     text: 'Change password',
-    href: `/${Routes.ChangePassword}`,
+    href: `${Routes.ChangePassword}`,
   },
   {
     text: 'Logout',
-    href: `/${Routes.SignIn}`,
+    href: `${Routes.SignIn}`,
   },
 ];
 
-class UserModal extends Component {
+interface UserModalProps extends ComponentProps {
+  UpdateAvatarForm: UpdateAvatarForm;
+  userData: DataRow[];
+  links: Link[];
+}
+
+class UserModal extends Component<UserModalProps> {
   constructor() {
     super('section', {
       UpdateAvatarForm: new UpdateAvatarForm(),
@@ -69,4 +74,8 @@ class UserModal extends Component {
   }
 }
 
-export default () => new Modal({ Content: new UserModal() });
+export default class UserModalPage extends Modal {
+  constructor() {
+    super({ Content: new UserModal() });
+  }
+}

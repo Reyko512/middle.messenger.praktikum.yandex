@@ -1,16 +1,20 @@
-import Component from '@shared/lib/components/Component';
+import Component, {
+  type ComponentEvents,
+  type ComponentProps,
+} from '@shared/lib/components/Component';
 import InputTemp from './Input.hbs';
 import type { TemplateDelegate } from 'handlebars';
 
-interface InputProps extends Record<string, unknown> {
+export interface InputProps extends ComponentProps {
   id?: string | number;
   type: string;
   value: string;
   name: string;
+  label: string;
   error?: string;
   autocomplete?: string;
   className?: string;
-  events?: Record<string, EventListener>;
+  events?: ComponentEvents;
 }
 
 export default class Input extends Component<InputProps> {
@@ -25,25 +29,23 @@ export default class Input extends Component<InputProps> {
   }
 
   public override componentDidUpdate(
-    _oldProps: InputProps,
-    _newProps: InputProps,
+    oldProps: InputProps,
+    newProps: InputProps,
   ): boolean {
-    if (_oldProps.value !== _newProps.value) {
-      const input = this.element?.querySelector(
-        'input',
-      ) as HTMLInputElement | null;
+    if (oldProps.value !== newProps.value) {
+      const input = this.element?.querySelector('input');
 
-      if (input && input.value !== _newProps.value) {
-        input.value = _newProps.value;
+      if (input instanceof HTMLInputElement && input.value !== newProps.value) {
+        input.value = newProps.value;
       }
 
-      this.element!.classList.toggle('_filled', Boolean(_newProps.value));
+      this.element?.classList.toggle('_filled', Boolean(newProps.value));
 
       return false;
     }
 
-    if (_oldProps.error !== _newProps.error) {
-      this.element!.classList.toggle('_error', Boolean(_newProps.error));
+    if (oldProps.error !== newProps.error) {
+      this.element?.classList.toggle('_error', Boolean(newProps.error));
       return true;
     }
 

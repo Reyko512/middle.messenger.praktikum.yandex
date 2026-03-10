@@ -3,10 +3,12 @@
   height: 46px;
   background: var(--floating-white);
   border-radius: 99px;
+  overflow: hidden;
 
-  img {
-    display: none;
+  &__image {
+    display: block;
     width: 46px;
     height: 46px;
+    object-fit: cover;
   }
 }

@@ -1,3 +1,4 @@
+import type { FormFieldConfig } from '@shared/lib/form/formController';
 import type { FormValidator } from '@shared/lib/form/formValidator';
 import {
   login,
@@ -5,16 +6,10 @@ import {
   required,
 } from '@shared/lib/form/validationRules';
 
-type Input = {
-  label: string;
-  id: string;
-  name: string;
-  type: 'password' | 'text';
-  autocomplete: string;
-  value: '';
-};
+type AuthFieldName = 'login' | 'password';
+export type AuthFormValues = Record<AuthFieldName, string>;
 
-export const inputs: Input[] = [
+export const inputs = [
   {
     label: 'login',
     id: 'login',
@@ -31,9 +26,9 @@ export const inputs: Input[] = [
     autocomplete: 'current-password',
     value: '',
   },
-];
+ ] as const satisfies readonly FormFieldConfig<AuthFieldName>[];
 
-export const setValidationRules = (value: FormValidator) => {
+export const setValidationRules = (value: FormValidator<AuthFormValues>) => {
   value
     .addRule('login', required(), login)
     .addRule('password', required(), password);
