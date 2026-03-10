@@ -4,6 +4,14 @@
 
 Проект учебного мессенджера на TypeScript + Vite с FSD-структурой, строгой типизацией, роутингом, HTTP API и WebSocket.
 
+## Design
+
+- https://www.figma.com/design/ejSycYEFYGPpu8EfV1jZu6/messanger-byte?node-id=1-4&t=XGArgxmmIffhONdF-1
+
+## Netlify
+
+- https://charming-haupia-7d6657.netlify.app/
+
 ## Функциональность
 
 - Роутинг страниц:
