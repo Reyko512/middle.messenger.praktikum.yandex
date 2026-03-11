@@ -1,5 +1,8 @@
 declare module '*.scss';
 declare module '*.hbs' {
-  export default Handlebars.template();
+  import type { TemplateDelegate } from 'handlebars';
+
+  const template: TemplateDelegate;
+
+  export default template;
 }
-declare module 'vite-plugin-handlebars';

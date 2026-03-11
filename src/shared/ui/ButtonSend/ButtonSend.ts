@@ -3,10 +3,8 @@ import ButtonTemp from './ButtonSend.hbs';
 
 import type { TemplateDelegate } from 'handlebars';
 
-interface ButtonSendProps extends ComponentProps {}
-
-export default class ButtonSend extends Component<ButtonSendProps> {
-  constructor(props: ButtonSendProps = {}) {
+export default class ButtonSend extends Component<ComponentProps> {
+  constructor(props: ComponentProps = {}) {
     super('button', {
       ...props,
       attrs: {

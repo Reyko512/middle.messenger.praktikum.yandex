@@ -16,7 +16,9 @@
     background: var(--filter-white);
     border: 1px solid transparent;
     color: var(--white);
-    font: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
 
     &::placeholder {
       color: var(--floating-white);

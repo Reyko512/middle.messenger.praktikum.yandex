@@ -1,4 +1,3 @@
-import handlebars from 'vite-plugin-handlebars';
 import customhbs from './src/app/config/vite-plugin-handlebars-precompile.js';
 import path from 'path';
 import tsconfig from './tsconfig.json';
@@ -33,12 +32,6 @@ export default defineConfig({
   },
 
   plugins: [
-    handlebars({
-      partialDirectory: [
-        path.resolve(__dirname, 'src/shared/ui/'),
-        path.resolve(__dirname, 'src/pages/**/**'),
-      ],
-    }),
     customhbs(),
   ],
 });

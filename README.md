@@ -2,48 +2,26 @@
 
 ## Messenger Byte
 
-Проект учебного мессенджера на TypeScript + Vite с FSD-структурой, строгой типизацией, роутингом, HTTP API и WebSocket.
+Учебный мессенджер на TypeScript и Vite с FSD-структурой, собственной компонентной системой, роутером, HTTP API и WebSocket-чатом.
 
-## Design
+## Дизайн
 
-- https://www.figma.com/design/ejSycYEFYGPpu8EfV1jZu6/messanger-byte?node-id=1-4&t=XGArgxmmIffhONdF-1
+- Figma: https://www.figma.com/design/ejSycYEFYGPpu8EfV1jZu6/messanger-byte?node-id=1-4&t=XGArgxmmIffhONdF-1
 
-## Netlify
+## Демо
 
-- https://charming-haupia-7d6657.netlify.app/
+- Netlify: https://charming-haupia-7d6657.netlify.app/
 
 ## Функциональность
 
-- Роутинг страниц:
-  - `/` — вход
-  - `/sign-up` — регистрация
-  - `/settings` — профиль пользователя
-  - `/messenger` — чат
-- Работа браузерной истории:
-  - переходы по UI;
-  - кнопки браузера `Назад`/`Вперёд`;
-  - восстановление страницы после `F5`.
-- Авторизация:
-  - регистрация;
-  - вход;
-  - выход.
-- Профиль:
-  - изменение данных пользователя;
-  - изменение аватара;
-  - изменение пароля.
-- Чаты:
-  - загрузка списка чатов;
-  - создание чата;
-  - добавление пользователя в чат;
-  - удаление пользователя из чата.
-- Сообщения:
-  - real-time сообщения через WebSocket;
-  - загрузка истории сообщений;
-  - заглушка, если чат не выбран.
-- Безопасность:
-  - экранирование шаблонов Handlebars;
-  - санитизация пользовательского ввода (базовая защита от XSS);
-  - обработка ошибок HTTP и WebSocket.
+- Аутентификация: регистрация, вход, выход, восстановление сессии.
+- Роутинг: `/`, `/sign-up`, `/messenger`, `/settings`, `/change-info`, `/change-password`, `/500`, fallback на `404`.
+- Защита маршрутов: гостевые и приватные гард-маршруты, редиректы при истечении сессии.
+- Чаты: загрузка списка, создание чатов, просмотр участников, добавление и удаление пользователей.
+- Сообщения: отправка текста и файлов, загрузка истории, real-time обновления через WebSocket.
+- Профиль: обновление общих данных, аватара и пароля.
+- UI: модальные окна, toast-уведомления, анимации переходов между страницами.
+- Безопасность: санитизация пользовательского ввода и экранирование шаблонов для базовой защиты от XSS.
 
 ## Технологии
 
@@ -51,15 +29,20 @@
 - Vite
 - Handlebars
 - SCSS
-- ESLint + Stylelint
-- Архитектура: FSD + MVC-подход
+- Feature-Sliced Design
+- ESLint
+- Stylelint
+- Mocha + Chai
+- Husky
 
-## Запуск
+## Установка и запуск
 
 ```bash
 npm install
 npm run dev
 ```
+
+После `npm install` автоматически настраивается `husky`, и `pre-commit` начинает запускать линтеры и тесты.
 
 ## Сборка
 
@@ -68,13 +51,19 @@ npm run build
 npm run preview
 ```
 
-## Проверки
+## Тесты и проверки
 
 ```bash
-npm run lint:code
-npm run lint:style
+npm test
 npx tsc --noEmit
+npm run lint
 ```
+
+Тесты лежат рядом с тестируемыми модулями:
+
+- `src/shared/lib/router/router.spec.ts`
+- `src/shared/lib/components/Component.spec.ts`
+- `src/shared/lib/http/http.spec.ts`
 
 ## API
 

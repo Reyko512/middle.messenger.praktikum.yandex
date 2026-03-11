@@ -1,0 +1,6 @@
+{
+  "extension": ["ts"],
+  "spec": ["src/**/*.spec.ts"],
+  "timeout": 5000,
+  "reporter": "spec"
+}
